@@ -5,6 +5,7 @@ export type { Role } from "@nenv/policy";
 export type Env = {
   DB: D1Database;
   SECRETS: KVNamespace;
+  ADMIN_EMAIL?: string;
 };
 
 export type Context = {

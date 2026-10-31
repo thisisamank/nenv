@@ -14,7 +14,7 @@ export type TestWorker = {
 
 export async function startWorker(): Promise<TestWorker> {
   const proxy = await getPlatformProxy<Env>({
-    configPath: new URL("../wrangler.jsonc", import.meta.url).pathname,
+    configPath: new URL("../../wrangler.jsonc", import.meta.url).pathname,
     persist: false,
   });
   const env = proxy.env;

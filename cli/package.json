@@ -1,18 +1,40 @@
 {
-  "name": "@nenv/cli",
+  "name": "nenv-cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "Encrypted environment variables that load when you cd into a repo. CLI for nenv.",
   "type": "module",
   "bin": {
-    "nenv": "src/main.ts"
+    "nenv": "dist/nenv.js"
   },
-  "dependencies": {
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisisamank/nenv.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/thisisamank/nenv#readme",
+  "keywords": [
+    "secrets",
+    "env",
+    "dotenv",
+    "cloudflare",
+    "cli"
+  ],
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/nenv.js",
+    "prepublishOnly": "node ../scripts/check-npm-account.ts && npm run build"
+  },
+  "devDependencies": {
     "@nenv/config": "*",
     "@nenv/crypto": "*",
     "@nenv/dotenv": "*",
-    "@nenv/policy": "*"
-  },
-  "devDependencies": {
-    "@nenv/worker": "*"
+    "@nenv/policy": "*",
+    "@nenv/worker": "*",
+    "esbuild": "^0.28.2"
   }
 }

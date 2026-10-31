@@ -1,7 +1,7 @@
 import type { Context } from "./context.ts";
 import { escapeHtml, htmlPage } from "./pages.ts";
 
-const INSTALL_COMMAND = "npm install -g @nenv/cli";
+const INSTALL_COMMAND = "npm install -g nenv-cli";
 
 export async function landingPage({ request }: Context): Promise<Response> {
   const origin = new URL(request.url).origin;

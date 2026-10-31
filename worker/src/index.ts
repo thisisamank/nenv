@@ -6,7 +6,16 @@ import { withEnvironment, withOrgAdmin, withProject, withUser } from "./guards.t
 import { HttpError, json } from "./http.ts";
 import { readInvite, regenerateInvite } from "./invites.ts";
 import { landingPage } from "./landing.ts";
-import { loginOptions, loginVerify, logout, registrationOptions, registrationVerify } from "./passkeys.ts";
+import {
+  loginOptions,
+  loginVerify,
+  logout,
+  registrationOptions,
+  registrationVerify,
+  setupOptions,
+  setupStatus,
+  setupVerify,
+} from "./passkeys.ts";
 import {
   deleteEnvironmentPolicy,
   deleteOrganizationPolicy,
@@ -55,6 +64,9 @@ const routes: Route[] = [
   route("POST", "/v1/auth/passkeys/login", loginVerify),
   route("POST", "/v1/auth/logout", logout),
   route("GET", "/v1/invites/:token", readInvite),
+  route("GET", "/v1/setup", setupStatus),
+  route("POST", "/v1/setup/options", setupOptions),
+  route("POST", "/v1/setup", setupVerify),
 
   route("GET", "/v1/me", withUser(getMe)),
   route("POST", "/v1/revisions", withUser(readRevisions)),

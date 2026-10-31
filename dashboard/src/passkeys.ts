@@ -16,3 +16,9 @@ export async function createPasskey(token: string): Promise<void> {
 export async function signOut(): Promise<void> {
   await api("POST", "/v1/auth/logout");
 }
+
+export async function setUpAdmin(email: string): Promise<void> {
+  const optionsJSON = await api<Parameters<typeof startRegistration>[0]["optionsJSON"]>("POST", "/v1/setup/options", { email });
+  const response = await startRegistration({ optionsJSON });
+  await api("POST", "/v1/setup", { email, response });
+}

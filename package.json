@@ -12,10 +12,19 @@
     "test": "node --test 'packages/*/test/*.test.ts' 'worker/test/*.test.ts' 'cli/test/*.test.ts'",
     "typecheck": "tsc && tsc -p worker && tsc -p cli && tsc -p dashboard",
     "build": "npm run build -w @nenv/dashboard",
-    "deploy": "node scripts/deploy.ts"
+    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
+    "setup": "node scripts/setup.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wrangler": "^4.156.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "ADMIN_EMAIL": {
+        "description": "Your email. Only this address can create the first admin passkey on the dashboard."
+      }
+    }
   }
 }
