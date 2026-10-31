@@ -3,6 +3,7 @@ import { api, environmentPath } from "../api.ts";
 import { inProject } from "../context.ts";
 import { readSecretValue } from "../prompt.ts";
 import { remoteSecretStore } from "../secret-store.ts";
+import { markChanged } from "../watch.ts";
 
 type SecretRow = { name: string; version: number; author: string; updatedAt: string };
 type VersionRow = { version: number; author: string; restoredFrom: number | null; createdAt: string };
@@ -32,6 +33,7 @@ async function setSecret([name]: string[]): Promise<void> {
 
   const store = remoteSecretStore(deployment, token, identity, target.repo, target.environment);
   const version = await store.set(name, value);
+  await markChanged(deployment, target.repo, target.environment);
   console.log(`Saved ${name} as version ${version} in ${target.repo} (${target.environment})`);
 }
 
@@ -78,6 +80,7 @@ async function rollbackSecret([name, version]: string[]): Promise<void> {
     `${environmentPath(target.repo, target.environment)}/secrets/${name}/rollback`,
     { token, body: { version: Number(version) } },
   );
+  await markChanged(deployment, target.repo, target.environment);
   console.log(`Restored ${name} v${version} as v${result.version}`);
 }
 

@@ -1,11 +1,12 @@
-import { approveActivation, showActivation } from "./activation.ts";
+import { approveDevice, redirectToActivation } from "./activation.ts";
 import { listDevices, reportCompliance, signOutDevice } from "./compliance.ts";
-import { startDashboardSession } from "./dashboard.ts";
 import type { Context, Env, Handler } from "./context.ts";
 import { issueSessionToken, startDeviceAuth } from "./device.ts";
 import { withEnvironment, withOrgAdmin, withProject, withUser } from "./guards.ts";
 import { HttpError, json } from "./http.ts";
+import { readInvite, regenerateInvite } from "./invites.ts";
 import { landingPage } from "./landing.ts";
+import { loginOptions, loginVerify, logout, registrationOptions, registrationVerify } from "./passkeys.ts";
 import {
   deleteEnvironmentPolicy,
   deleteOrganizationPolicy,
@@ -26,6 +27,7 @@ import {
   removeMember,
   shareEnvironmentKey,
 } from "./projects.ts";
+import { readRevisions } from "./revisions.ts";
 import { getBundle, listSecrets, listVersions, putSecret, rollbackSecret } from "./secrets.ts";
 import { findUser, getMe, inviteUser, listUsers, setPublicKey } from "./users.ts";
 
@@ -42,18 +44,25 @@ const ENVIRONMENT = `${PROJECT}/environments/:environment`;
 
 const routes: Route[] = [
   route("GET", "/", landingPage),
-  route("GET", "/activate", showActivation),
-  route("POST", "/activate", approveActivation),
-  route("POST", "/dashboard/session", startDashboardSession),
+  route("GET", "/activate", redirectToActivation),
 
   route("POST", "/v1/auth/device", startDeviceAuth),
   route("POST", "/v1/auth/token", issueSessionToken),
+  route("POST", "/v1/auth/activate", withUser(approveDevice)),
+  route("POST", "/v1/auth/passkeys/register/options", registrationOptions),
+  route("POST", "/v1/auth/passkeys/register", registrationVerify),
+  route("POST", "/v1/auth/passkeys/login/options", loginOptions),
+  route("POST", "/v1/auth/passkeys/login", loginVerify),
+  route("POST", "/v1/auth/logout", logout),
+  route("GET", "/v1/invites/:token", readInvite),
 
   route("GET", "/v1/me", withUser(getMe)),
+  route("POST", "/v1/revisions", withUser(readRevisions)),
   route("PUT", "/v1/me/public-key", withUser(setPublicKey)),
   route("GET", "/v1/users", withOrgAdmin(listUsers)),
   route("GET", "/v1/users/lookup", withUser(findUser)),
   route("POST", "/v1/users", withOrgAdmin(inviteUser)),
+  route("POST", "/v1/users/:userId/invite", withOrgAdmin(regenerateInvite)),
 
   route("GET", "/v1/devices", withOrgAdmin(listDevices)),
   route("DELETE", "/v1/devices/:deviceId", withOrgAdmin(signOutDevice)),

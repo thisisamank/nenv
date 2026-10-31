@@ -5,7 +5,7 @@ import { Avatar } from "../components/Avatar.tsx";
 import { ErrorLine, Loading, useToast } from "../components/Feedback.tsx";
 import { Icon } from "../components/Icon.tsx";
 import { capitalize, displayName } from "../format.ts";
-import { addToProject } from "../members.ts";
+import { addToProject, announceInvite } from "../members.ts";
 import type { Member, Project, Role } from "../types.ts";
 import { errorMessage, useResource } from "../use-resource.ts";
 
@@ -90,10 +90,17 @@ export function ProjectMembers({ project, environment }: { project: Project; env
 }
 
 function MemberStatus({ member, environment }: { member: Member; environment: string }) {
-  if (!member.hasPublicKey) {
+  if (!member.hasPasskey) {
     return (
       <span className="sub">
         <span className="pill">Invited</span>
+      </span>
+    );
+  }
+  if (!member.hasPublicKey) {
+    return (
+      <span className="sub">
+        <span className="pill">No terminal yet</span>
       </span>
     );
   }
@@ -120,8 +127,7 @@ function InviteForm({ project, canInviteNewUsers, onInvited }: { project: Projec
     event.preventDefault();
     setBusy(true);
     try {
-      await addToProject(project.repo, email, role, canInviteNewUsers);
-      notify(`Added ${email}`);
+      await announceInvite(email, await addToProject(project.repo, email, role, canInviteNewUsers), notify);
       setEmail("");
       onInvited();
     } catch (error) {

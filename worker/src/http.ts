@@ -7,6 +7,12 @@ export class HttpError extends Error {
   }
 }
 
+export function requireSameOrigin(request: Request): void {
+  if (request.headers.get("Origin") !== new URL(request.url).origin) {
+    throw new HttpError(403, "cross-origin requests are not allowed");
+  }
+}
+
 export function json(body: unknown, status = 200): Response {
   return Response.json(body, { status });
 }

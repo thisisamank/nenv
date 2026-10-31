@@ -13,6 +13,7 @@ import { writeJsonFile } from "../src/files.ts";
 import { hookEnv, type HookInput } from "../src/hook-env.ts";
 import { ensureIdentity, type Identity } from "../src/identity.ts";
 import { remoteSecretStore } from "../src/secret-store.ts";
+import { checkForUpdates, markChanged } from "../src/watch.ts";
 
 const SECRET = "it's $ecret\nline two";
 
@@ -88,6 +89,7 @@ function input(overrides: Partial<HookInput>): HookInput {
     state: "",
     deployment,
     startPoller: () => assert.fail("unexpected sign-in"),
+    startWatcher: () => {},
     openBrowser: () => assert.fail("unexpected browser"),
     ...overrides,
   };
@@ -217,4 +219,38 @@ test("warn mode loads secrets and reports the file", async () => {
 
   assert.deepEqual(result.messages, [".env.local: found", "loaded 1 secrets for github.com/acme/warn-mode (development)"]);
   assert.equal(existsSync(join(root, ".env.local")), true);
+});
+
+test("a secret saved from this shell loads at the next prompt", async () => {
+  const name = "github.com/acme/live-local";
+  await createProject(name);
+  const root = await gitRepo(`git@github.com:${name.split("/").slice(1).join("/")}.git`);
+
+  const entered = await hookEnv(input({ cwd: root }));
+  const state = bash(`${entered.lines.join("\n")}\nprintf '%s' "$_NENV_STATE"`);
+  assert.deepEqual(await hookEnv(input({ cwd: root, state })), { lines: [], messages: [] });
+
+  await store(name).set("FRESH", "just-saved");
+  await markChanged(deployment, name, "development");
+
+  const next = await hookEnv(input({ cwd: root, state }));
+  assert.deepEqual(next.messages, [`updated 1 secrets for ${name} (development)`]);
+  assert.equal(bash(`${entered.lines.join("\n")}\n${next.lines.join("\n")}\nprintf '%s' "$FRESH"`), "just-saved");
+});
+
+test("a change made elsewhere loads after the watcher sees the new revision", async () => {
+  const name = "github.com/acme/live-remote";
+  await createProject(name);
+  await store(name).set("SHARED", "v1");
+  const root = await gitRepo(`git@github.com:${name.split("/").slice(1).join("/")}.git`);
+
+  const entered = await hookEnv(input({ cwd: root }));
+  const state = bash(`${entered.lines.join("\n")}\nprintf '%s' "$_NENV_STATE"`);
+
+  await store(name).set("SHARED", "v2");
+  assert.deepEqual((await hookEnv(input({ cwd: root, state }))).lines, []);
+
+  assert.equal(await checkForUpdates(deployment), true);
+  const next = await hookEnv(input({ cwd: root, state }));
+  assert.equal(bash(`${entered.lines.join("\n")}\n${next.lines.join("\n")}\nprintf '%s' "$SHARED"`), "v2");
 });

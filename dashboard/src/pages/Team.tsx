@@ -5,7 +5,7 @@ import { Avatar } from "../components/Avatar.tsx";
 import { ErrorLine, Loading, useToast } from "../components/Feedback.tsx";
 import { Icon } from "../components/Icon.tsx";
 import { capitalize, displayName, shortRepo } from "../format.ts";
-import { addToProject } from "../members.ts";
+import { addToProject, announceInvite } from "../members.ts";
 import type { Role, User } from "../types.ts";
 import { errorMessage, useResource } from "../use-resource.ts";
 
@@ -126,7 +126,8 @@ export function Team() {
 }
 
 function KeyStatus({ user, missing }: { user: User; missing: string[] }) {
-  if (!user.hasPublicKey) return <span className="pill">Invited</span>;
+  if (!user.hasPasskey) return <span className="pill">Invited</span>;
+  if (!user.hasPublicKey) return <span className="pill">No terminal yet</span>;
   if (missing.length === 0) return <span className="pill ok">All shared</span>;
   return (
     <button className="btn sm" disabled title={KEY_SHARING_NOTE}>
@@ -151,12 +152,10 @@ function InviteForm({ onInvited }: { onInvited: () => void }) {
     setBusy(true);
     setError(undefined);
     try {
-      if (selected) {
-        await addToProject(selected, email, role, true);
-      } else {
-        await api("POST", "/v1/users", { email });
-      }
-      notify(`Invited ${email}`);
+      const inviteUrl = selected
+        ? await addToProject(selected, email, role, true)
+        : (await api<{ inviteUrl: string }>("POST", "/v1/users", { email })).inviteUrl;
+      await announceInvite(email, inviteUrl, notify);
       setEmail("");
       onInvited();
     } catch (caught) {

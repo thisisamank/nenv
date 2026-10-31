@@ -1,10 +1,12 @@
 import { api } from "../api.ts";
 import { useApp } from "../app-context.ts";
 import { AvatarStack } from "../components/Avatar.tsx";
+import { ConnectTerminal } from "../components/ConnectTerminal.tsx";
 import { EnvironmentList } from "../components/Environment.tsx";
 import { ErrorLine, Loading, useToast } from "../components/Feedback.tsx";
 import { Icon, type IconName } from "../components/Icon.tsx";
 import { displayName, shortRepo, timeAgo } from "../format.ts";
+import { inviteLink } from "../members.ts";
 import { href } from "../router.ts";
 import type { Device, User } from "../types.ts";
 import { useResource } from "../use-resource.ts";
@@ -26,9 +28,9 @@ export function Overview() {
   );
   const notify = useToast();
 
-  const copyInviteLink = () => {
-    navigator.clipboard.writeText(location.origin);
-    notify("Invite link copied");
+  const copyInviteLink = async (user: User) => {
+    await navigator.clipboard.writeText(await inviteLink(user.id));
+    notify(`New invite link for ${user.email} copied`);
   };
   const alerts = [...deviceAlerts(devices.data ?? []), ...userAlerts(users.data ?? [], copyInviteLink)];
 
@@ -37,6 +39,12 @@ export function Overview() {
       <div className="head">
         <h1>Overview</h1>
       </div>
+
+      {!me.publicKey && (
+        <section>
+          <ConnectTerminal />
+        </section>
+      )}
 
       {me.isAdmin && (
         <section>
@@ -155,10 +163,10 @@ function deviceAlerts(devices: Device[]): Alert[] {
   ];
 }
 
-function userAlerts(users: User[], copyInviteLink: () => void): Alert[] {
+function userAlerts(users: User[], copyInviteLink: (user: User) => void): Alert[] {
   return users.flatMap((user): Alert[] => {
     const name = displayName(user.email);
-    if (!user.hasPublicKey) {
+    if (!user.hasPasskey) {
       return [
         {
           key: `join-${user.id}`,
@@ -166,12 +174,12 @@ function userAlerts(users: User[], copyInviteLink: () => void): Alert[] {
           icon: "mail",
           title: `${name} has not joined yet`,
           detail: `Invited ${timeAgo(user.createdAt)}`,
-          action: { label: "Copy invite link", onClick: copyInviteLink },
+          action: { label: "Copy invite link", onClick: () => copyInviteLink(user) },
         },
       ];
     }
     return user.projects
-      .filter((project) => project.missingKeys.length > 0)
+      .filter((project) => user.hasPublicKey && project.missingKeys.length > 0)
       .map((project) => ({
         key: `key-${user.id}-${project.repo}`,
         tone: "warn",

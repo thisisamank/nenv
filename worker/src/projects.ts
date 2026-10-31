@@ -10,7 +10,7 @@ const ROLES: Role[] = ["reader", "editor", "admin"];
 type ProjectRow = { id: string; repo: string; name: string; role: Role; secretCount: number; updatedAt: string | null };
 type ProjectMemberRow = { projectId: string; email: string };
 type EnvironmentRow = { projectId: string; name: string; publicKey: string; hasKey: number };
-type MemberRow = { id: string; email: string; role: Role; keys: string | null; hasPublicKey: number };
+type MemberRow = { id: string; email: string; role: Role; keys: string | null; hasPublicKey: number; hasPasskey: number };
 
 export async function listProjects({ env, userId }: UserContext): Promise<Response> {
   const [projects, environments, members] = await env.DB.batch([
@@ -61,6 +61,7 @@ export async function listMembers({ env, projectId }: ProjectContext): Promise<R
   const { results } = await env.DB
     .prepare(
       `SELECT u.id, u.email, m.role, u.public_key IS NOT NULL AS hasPublicKey,
+              EXISTS (SELECT 1 FROM passkeys p WHERE p.user_id = u.id) AS hasPasskey,
               (SELECT group_concat(k.environment) FROM environment_keys k
                WHERE k.project_id = m.project_id AND k.user_id = u.id) AS keys
        FROM memberships m JOIN users u ON u.id = m.user_id
@@ -71,9 +72,10 @@ export async function listMembers({ env, projectId }: ProjectContext): Promise<R
     .all<MemberRow>();
 
   return json({
-    members: results.map(({ keys, hasPublicKey, ...member }) => ({
+    members: results.map(({ keys, hasPublicKey, hasPasskey, ...member }) => ({
       ...member,
       hasPublicKey: hasPublicKey === 1,
+      hasPasskey: hasPasskey === 1,
       environments: keys ? keys.split(",") : [],
     })),
   });

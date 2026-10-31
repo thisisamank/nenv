@@ -7,7 +7,9 @@ export type Route =
   | { page: "secret"; repo: string; environment: string; name: string }
   | { page: "team" }
   | { page: "policies"; repo?: string; environment?: string }
-  | { page: "devices" };
+  | { page: "devices" }
+  | { page: "join"; token: string }
+  | { page: "activate"; code?: string };
 
 export function href(route: Route): string {
   switch (route.page) {
@@ -17,6 +19,10 @@ export function href(route: Route): string {
       return `#/projects/${encodeURIComponent(route.repo)}/${route.environment}/${route.name}`;
     case "policies":
       return `#/policies${route.repo ? `/${encodeURIComponent(route.repo)}${route.environment ? `/${route.environment}` : ""}` : ""}`;
+    case "join":
+      return `#/join/${route.token}`;
+    case "activate":
+      return `#/activate${route.code ? `/${route.code}` : ""}`;
     case "overview":
       return "#/";
     default:
@@ -31,6 +37,12 @@ export function parse(hash: string): Route {
   }
   if (section === "projects" && repo) {
     return { page: "project", repo: decodeURIComponent(repo), environment };
+  }
+  if (section === "join" && repo) {
+    return { page: "join", token: repo };
+  }
+  if (section === "activate") {
+    return { page: "activate", code: repo };
   }
   if (section === "policies") {
     return { page: "policies", repo: repo ? decodeURIComponent(repo) : undefined, environment };

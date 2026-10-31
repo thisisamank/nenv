@@ -26,10 +26,18 @@ export async function api<T>(deployment: Deployment, method: string, path: strin
     method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    redirect: "manual",
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
 
-  const data: any = response.status === 204 ? null : await response.json().catch(() => null);
+  if (response.status >= 300 && response.status < 400) {
+    throw new ApiError(response.status, `${deployment.url} redirected the request, check that Cloudflare Access does not protect /v1`);
+  }
+
+  const data: any = response.status === 204 ? null : await response.json().catch(() => undefined);
+  if (data === undefined) {
+    throw new ApiError(response.status, `${deployment.url} did not return a NENV API response (status ${response.status})`);
+  }
   if (!response.ok) {
     throw new ApiError(response.status, data?.error ?? `request failed with status ${response.status}`);
   }

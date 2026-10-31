@@ -5,6 +5,7 @@ import type { Deployment } from "./deployment.ts";
 
 export type Bundle = {
   projectId: string;
+  revision: number;
   policies: Policies;
   environmentPublicKey: CryptoKey;
   environmentPrivateKey: CryptoKey;
@@ -13,6 +14,7 @@ export type Bundle = {
 
 type RawBundle = {
   projectId: string;
+  revision: number;
   policies: Policies;
   publicKey: string;
   wrappedKey: Sealed;
@@ -35,6 +37,7 @@ export async function fetchBundle(
   }
   return {
     projectId: raw.projectId,
+    revision: raw.revision,
     policies: raw.policies,
     environmentPublicKey: await importPublicKey(raw.publicKey),
     environmentPrivateKey,

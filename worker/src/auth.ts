@@ -1,5 +1,6 @@
 import type { Env } from "./context.ts";
-import { HttpError } from "./http.ts";
+import { readSessionCookie } from "./cookies.ts";
+import { HttpError, requireSameOrigin } from "./http.ts";
 import { organizationPolicies } from "./policy-store.ts";
 
 export async function hashToken(token: string): Promise<string> {
@@ -40,9 +41,13 @@ export async function createSession(env: Env, userId: string, deviceName: string
 }
 
 export async function authenticate(request: Request, env: Env): Promise<Session> {
-  const token = request.headers.get("Authorization")?.match(/^Bearer (\S+)$/)?.[1];
+  const bearer = request.headers.get("Authorization")?.match(/^Bearer (\S+)$/)?.[1];
+  const token = bearer ?? readSessionCookie(request);
   if (!token) {
-    throw new HttpError(401, "missing bearer token");
+    throw new HttpError(401, "not signed in");
+  }
+  if (!bearer && request.method !== "GET" && request.method !== "HEAD") {
+    requireSameOrigin(request);
   }
 
   const tokenHash = await hashToken(token);

@@ -45,6 +45,7 @@ export type Member = {
   email: string;
   role: Role;
   hasPublicKey: boolean;
+  hasPasskey: boolean;
   environments: string[];
 };
 
@@ -53,6 +54,7 @@ export type User = {
   email: string;
   isAdmin: boolean;
   hasPublicKey: boolean;
+  hasPasskey: boolean;
   createdAt: string;
   projects: { repo: string; role: Role; missingKeys: string[] }[];
 };

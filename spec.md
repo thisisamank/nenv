@@ -99,12 +99,12 @@ Authentication requirements:
 
 Identity:
 
-- Cloudflare Access protects the activation page (`/activate`). NENV does not implement SSO itself.
-- The Worker verifies the Access JWT and uses its email as the user identity.
-- The first user who activates a device on an empty deployment becomes the organization admin.
-- Other users must be invited by an admin before they can activate a device.
-- The activation endpoint rejects cross-origin form posts.
-- The API (`/v1/*`) is not behind Access. It uses NENV session tokens.
+- People sign in with passkeys. NENV needs no identity provider, SSO, or Cloudflare Access setup.
+- `npm run deploy -- --admin you@example.com` deploys NENV and prints a one-time setup link for the first admin.
+- Admins invite people from the dashboard. An invite creates a one-time link (valid 7 days) that the admin sends. Opening it creates the person's passkey.
+- A lost passkey is recovered with a new invite link from an admin.
+- The browser session is an HttpOnly, SameSite=Strict cookie. Cookie-authenticated writes must come from the same origin.
+- The CLI approves its device code in the signed-in dashboard (`/activate` redirects there) and then uses a bearer session token.
 
 Secret loading requirements:
 
@@ -213,12 +213,12 @@ The dashboard provides:
 - **History:** View changes and roll back versions.
 - **Devices:** View registered devices and compliance status.
 
-The Worker serves the dashboard under `/dashboard/`. Cloudflare Access protects `/dashboard` and `/activate`; the dashboard exchanges the Access identity for a NENV session (`POST /dashboard/session`).
+The Worker serves the dashboard under `/dashboard/`. People sign in with their passkey.
 
 - The dashboard never decrypts secrets. It writes new values by sealing them to the environment public key in the browser.
 - Creating an environment in the browser wraps its private key for the creator's registered public key.
 - Sharing an environment key with another member needs a private key in the browser. Until per-device keys exist, key sharing is a CLI action (`nenv grant`).
-- For local development only, `DEV_ACCESS_EMAIL` in `worker/.dev.vars` stands in for Access on `localhost`.
+
 
 ## 9. CLI Commands
 
@@ -257,7 +257,7 @@ Secret entry must not expose values through terminal echo or command-line argume
 
 The MVP must support:
 
-1. One-click deployment to Cloudflare.
+1. One-command deployment to Cloudflare (`npm run deploy -- --admin you@example.com`).
 2. Landing page with CLI install and shell setup, and automatic authentication on shell start.
 3. `.nenv` project configuration.
 4. Automatic directory-based secret injection and removal.

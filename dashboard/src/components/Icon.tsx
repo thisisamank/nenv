@@ -22,6 +22,7 @@ const PATHS = {
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
   trash: <path d="M4 7h16M10 3h4M6 7l1 14h10l1-14" />,
   restore: <><path d="M4 12a8 8 0 1 0 2.3-5.6" /><path d="M4 4v4h4" /></>,
+  logout: <><path d="M14 4h5v16h-5" /><path d="M10 8l-4 4 4 4M6 12h10" /></>,
   branch: <><circle cx="6" cy="5.5" r="2" /><circle cx="6" cy="18.5" r="2" /><circle cx="18" cy="8" r="2" /><path d="M6 7.5v9M18 10c0 4-6 3-11.2 7" /></>,
 } satisfies Record<string, ReactNode>;
 

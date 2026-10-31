@@ -9,12 +9,13 @@
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
+    "@nenv/config": "*",
     "@nenv/crypto": "*",
     "@nenv/policy": "*",
     "@phosphor-icons/react": "^2.1.10",
+    "@simplewebauthn/browser": "^14.0.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "@nenv/config": "*"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

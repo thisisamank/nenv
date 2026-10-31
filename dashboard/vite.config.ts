@@ -10,7 +10,6 @@ export default defineConfig({
   server: {
     proxy: {
       "/v1": worker,
-      "/dashboard/session": { target: worker, headers: { Origin: worker } },
     },
   },
 });

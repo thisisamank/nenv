@@ -1,5 +1,3 @@
-import { sessionToken } from "./session.ts";
-
 export class ApiError extends Error {
   status: number;
 
@@ -10,10 +8,11 @@ export class ApiError extends Error {
 }
 
 export async function api<T = unknown>(method: string, path: string, body?: unknown): Promise<T> {
-  let response = await send(method, path, body, await sessionToken());
-  if (response.status === 401) {
-    response = await send(method, path, body, await sessionToken(true));
-  }
+  const response = await fetch(path, {
+    method,
+    headers: body === undefined ? {} : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
 
   const data = response.status === 204 ? null : await response.json().catch(() => null);
   if (!response.ok) {
@@ -28,15 +27,4 @@ export function repoPath(repo: string): string {
 
 export function environmentPath(repo: string, environment: string): string {
   return `${repoPath(repo)}/environments/${environment}`;
-}
-
-function send(method: string, path: string, body: unknown, token: string): Promise<Response> {
-  return fetch(path, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
 }

@@ -51,6 +51,7 @@ export async function getBundle(context: EnvironmentContext): Promise<Response> 
   return json({
     projectId: context.projectId,
     policies: context.policies,
+    revision: snapshot.revision,
     publicKey: state.public_key,
     wrappedKey: JSON.parse(state.wrapped_key),
     secrets: snapshot.secrets,

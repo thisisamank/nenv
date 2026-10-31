@@ -2,7 +2,9 @@ export type Shell = "zsh" | "bash";
 
 const HOOKS: Record<Shell, string> = {
   zsh: `_nenv_hook() {
-  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" ]]; then
+  local revision=""
+  [[ -n "$_NENV_REV_FILE" && -r "$_NENV_REV_FILE" ]] && revision="$(<"$_NENV_REV_FILE")"
+  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" || "$revision" != "$_NENV_REV" ]]; then
     _NENV_PWD="$PWD"
     eval "$(printf '%s' "$_NENV_STATE" | command nenv hook-env zsh)"
   fi
@@ -12,8 +14,9 @@ if (( ! \${precmd_functions[(I)_nenv_hook]} )); then precmd_functions=(_nenv_hoo
 if (( ! \${chpwd_functions[(I)_nenv_hook]} )); then chpwd_functions=(_nenv_hook $chpwd_functions); fi
 `,
   bash: `_nenv_hook() {
-  local previous_exit=$?
-  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" ]]; then
+  local previous_exit=$? revision=""
+  [[ -n "$_NENV_REV_FILE" && -r "$_NENV_REV_FILE" ]] && revision="$(<"$_NENV_REV_FILE")"
+  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" || "$revision" != "$_NENV_REV" ]]; then
     _NENV_PWD="$PWD"
     eval "$(printf '%s' "$_NENV_STATE" | command nenv hook-env bash)"
   fi

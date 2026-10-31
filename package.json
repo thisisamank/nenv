@@ -11,7 +11,8 @@
   "scripts": {
     "test": "node --test 'packages/*/test/*.test.ts' 'worker/test/*.test.ts' 'cli/test/*.test.ts'",
     "typecheck": "tsc && tsc -p worker && tsc -p cli && tsc -p dashboard",
-    "build": "npm run build -w @nenv/dashboard"
+    "build": "npm run build -w @nenv/dashboard",
+    "deploy": "node scripts/deploy.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

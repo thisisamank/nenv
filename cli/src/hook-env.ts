@@ -8,6 +8,7 @@ import { remoteSecretStore } from "./secret-store.ts";
 import { clearSession, loadSession, readPendingSignIn, startSignIn } from "./session.ts";
 import { exportLine, setLine, unsetLine } from "./shell.ts";
 import { findTarget, type Target } from "./target.ts";
+import { markerPath, readMarker, watchEnvironment, writeMarker } from "./watch.ts";
 
 type LoadedState = {
   repo: string;
@@ -15,6 +16,7 @@ type LoadedState = {
   previous: Record<string, string | null>;
   retry: boolean;
   notified?: string;
+  revision?: number;
 };
 
 export type HookInput = {
@@ -23,6 +25,7 @@ export type HookInput = {
   state: string;
   deployment: Deployment | null;
   startPoller: () => void;
+  startWatcher: () => void;
   openBrowser: (url: string) => void;
 };
 
@@ -36,13 +39,13 @@ export async function hookEnv(input: HookInput): Promise<HookOutput> {
   const messages: string[] = [];
   const target = input.deployment ? await findTargetOrReport(input, messages) : null;
 
-  if (state && target && !state.retry && state.repo === target.repo && state.environment === target.environment) {
+  if (state && target && !state.retry && sameTarget(state, target) && (await isCurrent(input, state))) {
     return { lines: [], messages };
   }
 
   const lines = state ? restoreLines(state) : [];
   if (!target) {
-    if (state) lines.push(unsetLine("_NENV_STATE"), unsetLine("_NENV_RETRY"));
+    if (state) lines.push(...["_NENV_STATE", "_NENV_RETRY", "_NENV_REV_FILE", "_NENV_REV"].map(unsetLine));
     return { lines, messages };
   }
 
@@ -51,8 +54,23 @@ export async function hookEnv(input: HookInput): Promise<HookOutput> {
     ...loaded.lines,
     setLine("_NENV_STATE", encodeState(loaded.state)),
     loaded.state.retry ? setLine("_NENV_RETRY", "1") : unsetLine("_NENV_RETRY"),
+    ...revisionLines(input, target, loaded.state.revision),
   );
   return { lines, messages };
+}
+
+function sameTarget(state: LoadedState, target: Target): boolean {
+  return state.repo === target.repo && state.environment === target.environment;
+}
+
+async function isCurrent(input: HookInput, state: LoadedState): Promise<boolean> {
+  if (state.revision === undefined || !input.deployment) return true;
+  return (await readMarker(markerPath(input.deployment, state.repo, state.environment))) === String(state.revision);
+}
+
+function revisionLines(input: HookInput, target: Target, revision: number | undefined): string[] {
+  if (revision === undefined || !input.deployment) return [unsetLine("_NENV_REV_FILE"), unsetLine("_NENV_REV")];
+  return [setLine("_NENV_REV_FILE", markerPath(input.deployment, target.repo, target.environment)), setLine("_NENV_REV", String(revision))];
 }
 
 async function load(
@@ -88,12 +106,16 @@ async function load(
       lines.push(exportLine(name, value));
     }
 
-    messages.push(`loaded ${lines.length} secrets for ${target.repo} (${target.environment})`);
+    const reloaded = state !== null && sameTarget(state, target) && state.revision !== undefined;
+    messages.push(`${reloaded ? "updated" : "loaded"} ${lines.length} secrets for ${target.repo} (${target.environment})`);
     const missing = target.requiredSecrets.filter((name) => !(name in bundle.secrets));
     if (missing.length > 0) {
       messages.push(`missing required secrets: ${missing.join(", ")}`);
     }
-    return { lines, state: { ...empty, previous } };
+    await writeMarker(markerPath(deployment, target.repo, target.environment), String(bundle.revision));
+    await watchEnvironment(deployment, target.repo, target.environment);
+    input.startWatcher();
+    return { lines, state: { ...empty, previous, revision: bundle.revision } };
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       await clearSession(deployment);

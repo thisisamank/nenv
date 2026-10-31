@@ -5,9 +5,6 @@ export type { Role } from "@nenv/policy";
 export type Env = {
   DB: D1Database;
   SECRETS: KVNamespace;
-  ACCESS_TEAM_DOMAIN: string;
-  ACCESS_AUD: string;
-  DEV_ACCESS_EMAIL?: string;
 };
 
 export type Context = {

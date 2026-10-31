@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { displayName } from "../format.ts";
 import { href, type Route } from "../router.ts";
 import type { Me } from "../types.ts";
+import { signOut } from "../passkeys.ts";
 import { Avatar } from "./Avatar.tsx";
 import { Icon, type IconName } from "./Icon.tsx";
 
@@ -17,7 +18,9 @@ const NAV: NavItem[] = [
 
 const SECTION: Partial<Record<Route["page"], Route["page"]>> = { project: "projects", secret: "projects" };
 
-export function Layout({ me, route, attention, children }: { me: Me; route: Route; attention: number; children: ReactNode }) {
+type LayoutProps = { me: Me; route: Route; attention: number; onSignedOut: () => void; children: ReactNode };
+
+export function Layout({ me, route, attention, onSignedOut, children }: LayoutProps) {
   const current = SECTION[route.page] ?? route.page;
 
   return (
@@ -42,6 +45,9 @@ export function Layout({ me, route, attention, children }: { me: Me; route: Rout
             <b>{displayName(me.email)}</b>
             <span>{me.isAdmin ? "Org admin" : "Member"}</span>
           </div>
+          <button className="icon-btn" aria-label="Sign out" title="Sign out" onClick={() => signOut().then(onSignedOut)}>
+            <Icon name="logout" />
+          </button>
         </div>
       </aside>
       <main>{children}</main>

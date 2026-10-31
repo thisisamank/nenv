@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export type Resource<T> = {
   data?: T;
   error?: string;
+  status?: number;
   loading: boolean;
   reload: () => void;
 };
@@ -16,7 +17,9 @@ export function useResource<T>(load: () => Promise<T>, deps: unknown[]): Resourc
     setState((previous) => ({ ...previous, loading: true }));
     load().then(
       (data) => request === latest.current && setState({ data, loading: false }),
-      (error: unknown) => request === latest.current && setState({ error: errorMessage(error), loading: false }),
+      (error: unknown) =>
+        request === latest.current &&
+        setState({ error: errorMessage(error), status: (error as { status?: number }).status, loading: false }),
     );
   }, deps);
 

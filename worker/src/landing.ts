@@ -18,7 +18,8 @@ export async function landingPage({ request }: Context): Promise<Response> {
 <p>Bash: add these lines to <code>~/.bashrc</code></p>
 <pre>${escapeHtml(shellLines(origin, "bash"))}</pre>
 <h2>3. Open a new terminal</h2>
-<p>NENV asks you to sign in the first time, and again when your session expires.</p>`,
+<p>NENV asks you to sign in the first time, and again when your session expires.</p>
+<p><a href="/dashboard/">Open the dashboard</a></p>`,
   );
 }
 

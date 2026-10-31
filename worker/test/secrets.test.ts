@@ -65,7 +65,7 @@ test("rejects invalid secret names, repos, and ciphertexts", async () => {
 
 test("creates versions, rolls back, and serves the active version in the bundle", async () => {
   const first = await as("usr_editor", "PUT", "/secrets/DATABASE_URL", SEALED);
-  assert.deepEqual(first, { status: 201, body: { name: "DATABASE_URL", version: 1 } });
+  assert.deepEqual([first.status, first.body], [201, { name: "DATABASE_URL", version: 1 }]);
 
   const updated = { ephemeralPublicKey: PUBLIC_KEY, iv: "aXYy", ciphertext: "bmV3" };
   assert.equal((await as("usr_editor", "PUT", "/secrets/DATABASE_URL", updated)).body.version, 2);
@@ -111,4 +111,22 @@ test("falls back to D1 when the KV snapshot is stale", async () => {
 
 test("returns 404 when rolling back to a missing version", async () => {
   assert.equal((await as("usr_editor", "POST", "/secrets/DATABASE_URL/rollback", { version: 99 })).status, 404);
+});
+
+test("the bundle carries its revision and the revisions endpoint reports changes for members only", async () => {
+  const before = (await as("usr_reader", "GET", "/bundle")).body.revision;
+  const environments = [
+    { repo: REPO, environment: "development" },
+    { repo: "github.com/acme/other", environment: "development" },
+  ];
+
+  const first = await call(worker.env, "POST", "/v1/revisions", { token: tokens.usr_reader, body: { environments } });
+  assert.deepEqual(first.body.revisions, [{ repo: REPO, environment: "development", revision: before }]);
+
+  await as("usr_editor", "PUT", "/secrets/NEW_ONE", SEALED);
+  const second = await call(worker.env, "POST", "/v1/revisions", { token: tokens.usr_reader, body: { environments } });
+  assert.equal(second.body.revisions[0].revision, before + 1);
+
+  const outsider = await call(worker.env, "POST", "/v1/revisions", { token: tokens.usr_outsider, body: { environments } });
+  assert.deepEqual(outsider.body.revisions, []);
 });

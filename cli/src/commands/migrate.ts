@@ -5,6 +5,7 @@ import { reportCompliance } from "../compliance.ts";
 import { inProject } from "../context.ts";
 import { confirm } from "../prompt.ts";
 import { remoteSecretStore } from "../secret-store.ts";
+import { markChanged } from "../watch.ts";
 
 export async function migrateCommand(): Promise<void> {
   const { deployment, token, identity, target } = await inProject();
@@ -51,6 +52,7 @@ export async function migrateCommand(): Promise<void> {
     outcomes.push({ path, status: deleted ? "deleted" : "changed", names: [] });
   }
 
+  await markChanged(deployment, target.repo, target.environment);
   await reportCompliance(deployment, token, target, {
     blocked: outcomes.some((outcome) => outcome.status !== "deleted"),
     files: outcomes,

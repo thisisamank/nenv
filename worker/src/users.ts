@@ -1,6 +1,7 @@
 import { newId } from "./auth.ts";
 import type { UserContext } from "./context.ts";
 import { HttpError, json, readJson } from "./http.ts";
+import { createInviteLink } from "./invites.ts";
 import { isPublicKey } from "./sealed.ts";
 
 const EMAIL = /^[^\s@]+@[^\s@]+$/;
@@ -31,14 +32,15 @@ export async function setPublicKey({ request, env, userId }: UserContext): Promi
   return json({ publicKey });
 }
 
-type UserRow = { id: string; email: string; isAdmin: number; hasPublicKey: number; createdAt: string };
+type UserRow = { id: string; email: string; isAdmin: number; hasPublicKey: number; hasPasskey: number; createdAt: string };
 type MembershipRow = { userId: string; repo: string; role: string; environments: string; keys: string | null };
 
 export async function listUsers({ env }: UserContext): Promise<Response> {
   const [users, memberships] = await env.DB.batch([
     env.DB.prepare(
-      `SELECT id, email, is_admin = 1 AS isAdmin, public_key IS NOT NULL AS hasPublicKey, created_at AS createdAt
-       FROM users ORDER BY email`,
+      `SELECT u.id, u.email, u.is_admin = 1 AS isAdmin, u.public_key IS NOT NULL AS hasPublicKey,
+              EXISTS (SELECT 1 FROM passkeys p WHERE p.user_id = u.id) AS hasPasskey, u.created_at AS createdAt
+       FROM users u ORDER BY u.email`,
     ),
     env.DB.prepare(
       `SELECT m.user_id AS userId, p.repo, m.role,
@@ -56,6 +58,7 @@ export async function listUsers({ env }: UserContext): Promise<Response> {
       ...user,
       isAdmin: user.isAdmin === 1,
       hasPublicKey: user.hasPublicKey === 1,
+      hasPasskey: user.hasPasskey === 1,
       projects: (byUser.get(user.id) ?? []).map(({ repo, role, environments, keys }) => {
         const held = keys ? keys.split(",") : [];
         return {
@@ -95,5 +98,5 @@ export async function inviteUser({ request, env }: UserContext): Promise<Respons
   if (!user) {
     throw new HttpError(409, "this user already exists");
   }
-  return json(user, 201);
+  return json({ ...user, inviteUrl: await createInviteLink(env.DB, request, user.id) }, 201);
 }

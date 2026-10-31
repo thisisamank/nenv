@@ -1,188 +1,141 @@
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
-import { ACCESS, call, fetchWorker, startWorker, type TestWorker } from "./helpers.ts";
+import { TestAuthenticator } from "./authenticator.ts";
+import { addUser, call, startWorker, type TestWorker } from "./helpers.ts";
 
 const ORIGIN = "https://nenv.test";
-const CERTS_URL = `https://${ACCESS.ACCESS_TEAM_DOMAIN}/cdn-cgi/access/certs`;
-const realFetch = globalThis.fetch;
 
 let worker: TestWorker;
-let signingKey: CryptoKey;
+let admin: string;
 
 before(async () => {
   worker = await startWorker();
-
-  const pair = (await crypto.subtle.generateKey(
-    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-    true,
-    ["sign", "verify"],
-  )) as CryptoKeyPair;
-  signingKey = pair.privateKey;
-  const jwk = { ...(await crypto.subtle.exportKey("jwk", pair.publicKey)), kid: "test-key" };
-
-  globalThis.fetch = async (input, init) =>
-    String(input) === CERTS_URL ? Response.json({ keys: [jwk] }) : realFetch(input, init);
+  admin = await addUser(worker.env, "usr_admin", true);
 });
 
-after(async () => {
-  globalThis.fetch = realFetch;
-  await worker.dispose();
-});
+after(() => worker.dispose());
 
-function base64Url(data: string | ArrayBuffer): string {
-  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : new Uint8Array(data);
-  return btoa(String.fromCharCode(...bytes)).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+function api(method: string, path: string, options: { body?: unknown; cookie?: string; token?: string; origin?: string | null } = {}) {
+  const headers: Record<string, string> = {};
+  if (options.cookie) headers.Cookie = `nenv_session=${options.cookie}`;
+  if (options.origin !== null) headers.Origin = options.origin ?? ORIGIN;
+  return call(worker.env, method, path, { body: options.body, token: options.token, headers });
 }
 
-async function accessJwt(email: string, overrides: Record<string, unknown> = {}): Promise<string> {
-  const header = base64Url(JSON.stringify({ alg: "RS256", kid: "test-key" }));
-  const payload = base64Url(
-    JSON.stringify({
-      iss: `https://${ACCESS.ACCESS_TEAM_DOMAIN}`,
-      aud: [ACCESS.ACCESS_AUD],
-      email,
-      exp: Math.floor(Date.now() / 1000) + 300,
-      ...overrides,
-    }),
-  );
-  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", signingKey, new TextEncoder().encode(`${header}.${payload}`));
-  return `${header}.${payload}.${base64Url(signature)}`;
+function sessionFrom(response: { headers: Headers }): string {
+  const cookie = response.headers.get("Set-Cookie") ?? "";
+  assert.match(cookie, /HttpOnly; Secure; SameSite=Strict/);
+  return cookie.match(/nenv_session=([0-9a-f]{64})/)![1]!;
 }
 
-async function activate(email: string, userCode: string, headers: Record<string, string> = {}) {
-  return call(worker.env, "POST", "/activate", {
-    body: new URLSearchParams({ code: userCode.toLowerCase() }),
-    headers: { Origin: ORIGIN, "Cf-Access-Jwt-Assertion": await accessJwt(email), ...headers },
-  });
+async function invite(email: string): Promise<string> {
+  const created = await api("POST", "/v1/users", { token: admin, body: { email } });
+  assert.equal(created.status, 201);
+  assert.match(created.body.inviteUrl, /^https:\/\/nenv\.test\/dashboard\/#\/join\/[0-9a-f]{64}$/);
+  return created.body.inviteUrl.split("/join/")[1];
 }
 
-async function startDevice() {
-  return (await call(worker.env, "POST", "/v1/auth/device")).body;
+async function join(token: string, authenticator: TestAuthenticator): Promise<string> {
+  const options = await api("POST", "/v1/auth/passkeys/register/options", { body: { token } });
+  assert.equal(options.status, 200);
+  const response = await authenticator.register(options.body, ORIGIN);
+  const registered = await api("POST", "/v1/auth/passkeys/register", { body: { token, response } });
+  assert.equal(registered.status, 200, JSON.stringify(registered.body));
+  return sessionFrom(registered);
 }
 
-async function poll(deviceCode: string) {
-  return call(worker.env, "POST", "/v1/auth/token", { body: { deviceCode } });
+async function signIn(authenticator: TestAuthenticator) {
+  const options = await api("POST", "/v1/auth/passkeys/login/options");
+  const response = await authenticator.assert(options.body, ORIGIN);
+  return { response, result: await api("POST", "/v1/auth/passkeys/login", { body: { response } }) };
 }
 
 test("the landing page shows shell lines for this deployment", async () => {
   const page = await call(worker.env, "GET", "/");
-  assert.equal(page.status, 200);
   assert.match(page.body, /export NENV_URL=&quot;https:\/\/nenv\.test&quot;/);
   assert.match(page.body, /nenv shell zsh/);
-  assert.match(page.body, /nenv shell bash/);
 });
 
-test("the first activated user becomes the organization admin", async () => {
-  const device = await startDevice();
-  assert.match(device.userCode, /^[A-Z2-9]{4}-[A-Z2-9]{4}$/);
-  assert.equal(device.verificationUriComplete, `${ORIGIN}/activate?code=${device.userCode}`);
-  assert.deepEqual((await poll(device.deviceCode)).body, { error: "authorization_pending" });
+const ana = new TestAuthenticator();
 
-  const page = await call(worker.env, "GET", `/activate?code=${device.userCode}`, {
-    headers: { "Cf-Access-Jwt-Assertion": await accessJwt("Founder@Example.com") },
-  });
-  assert.match(page.body, /founder@example\.com/);
-  assert.match(page.body, new RegExp(`value="${device.userCode}"`));
+test("an invite link registers a passkey and signs the person in", async () => {
+  const token = await invite("Ana@Example.com");
+  assert.deepEqual((await api("GET", `/v1/invites/${token}`)).body, { email: "ana@example.com" });
 
-  assert.equal((await activate("founder@example.com", device.userCode)).status, 200);
+  const session = await join(token, ana);
+  const me = await api("GET", "/v1/me", { cookie: session });
+  assert.deepEqual([me.body.email, me.body.isAdmin], ["ana@example.com", false]);
 
-  const session = await poll(device.deviceCode);
-  assert.equal(session.status, 200);
-  assert.match(session.body.token, /^[0-9a-f]{64}$/);
-
-  const me = await call(worker.env, "GET", "/v1/me", { token: session.body.token });
-  assert.deepEqual({ email: me.body.email, isAdmin: me.body.isAdmin }, { email: "founder@example.com", isAdmin: true });
-
-  assert.deepEqual((await poll(device.deviceCode)).body, { error: "expired_token" });
+  assert.equal((await api("GET", `/v1/invites/${token}`)).status, 404);
+  assert.equal((await api("POST", "/v1/auth/passkeys/register/options", { body: { token } })).status, 404);
 });
 
-test("users must be invited before they can activate a device", async () => {
-  const device = await startDevice();
-  const rejected = await activate("newcomer@example.com", device.userCode);
-  assert.equal(rejected.status, 403);
-  assert.match(rejected.body, /not been invited/);
+test("a registered passkey signs in, and an assertion cannot be replayed", async () => {
+  const { response, result } = await signIn(ana);
+  assert.equal(result.status, 200);
+  const me = await api("GET", "/v1/me", { cookie: sessionFrom(result) });
+  assert.equal(me.body.email, "ana@example.com");
 
-  const founder = await sessionFor("founder@example.com");
-  const invite = await call(worker.env, "POST", "/v1/users", { token: founder, body: { email: "Newcomer@Example.com" } });
-  assert.equal(invite.status, 201);
-
-  assert.equal((await activate("newcomer@example.com", device.userCode)).status, 200);
-  const me = await call(worker.env, "GET", "/v1/me", { token: (await poll(device.deviceCode)).body.token });
-  assert.equal(me.body.isAdmin, false);
+  const replay = await api("POST", "/v1/auth/passkeys/login", { body: { response } });
+  assert.equal(replay.status, 401);
 });
 
-test("only organization admins can invite users", async () => {
-  const newcomer = await sessionFor("newcomer@example.com");
-  const invite = await call(worker.env, "POST", "/v1/users", { token: newcomer, body: { email: "x@example.com" } });
-  assert.equal(invite.status, 403);
+test("an unknown passkey cannot sign in", async () => {
+  const stranger = new TestAuthenticator();
+  await stranger.register({ challenge: "x", rp: { id: "nenv.test" }, user: { id: "x" } }, ORIGIN);
+  assert.equal((await signIn(stranger)).result.status, 401);
 });
 
-test("activation rejects cross-origin posts and invalid Access tokens", async () => {
-  const device = await startDevice();
-
-  assert.equal((await activate("founder@example.com", device.userCode, { Origin: "https://evil.test" })).status, 403);
-
-  const invalidTokens = [
-    await accessJwt("founder@example.com", { aud: ["other-app"] }),
-    await accessJwt("founder@example.com", { exp: Math.floor(Date.now() / 1000) - 10 }),
-    await accessJwt("founder@example.com", { iss: "https://evil.cloudflareaccess.com" }),
-    tamperSignature(await accessJwt("founder@example.com")),
-    "not-a-jwt",
-  ];
-  for (const token of invalidTokens) {
-    const result = await activate("founder@example.com", device.userCode, { "Cf-Access-Jwt-Assertion": token });
-    assert.equal(result.status, 401);
-  }
-
-  assert.deepEqual((await poll(device.deviceCode)).body, { error: "authorization_pending" });
-});
-
-test("a public key can be registered once", async () => {
-  const token = await sessionFor("founder@example.com");
+test("cookie sessions reject cross-origin writes, bearer tokens do not need an origin", async () => {
+  const session = sessionFrom((await signIn(ana)).result);
   const publicKey = btoa(String.fromCharCode(...new Uint8Array(65).fill(4)));
 
-  assert.equal((await call(worker.env, "PUT", "/v1/me/public-key", { token, body: { publicKey } })).status, 200);
-  assert.equal((await call(worker.env, "PUT", "/v1/me/public-key", { token, body: { publicKey } })).status, 409);
-
-  const found = await call(worker.env, "GET", "/v1/users/lookup?email=founder@example.com", { token });
-  assert.equal(found.body.publicKey, publicKey);
-});
-
-test("the dashboard gets a session from the Access identity", async () => {
-  const headers = { Origin: ORIGIN, "Cf-Access-Jwt-Assertion": await accessJwt("founder@example.com") };
-
-  const session = await call(worker.env, "POST", "/dashboard/session", { headers });
-  assert.equal(session.status, 200);
-  const me = await call(worker.env, "GET", "/v1/me", { token: session.body.token });
-  assert.equal(me.body.email, "founder@example.com");
-
-  const crossOrigin = await call(worker.env, "POST", "/dashboard/session", { headers: { ...headers, Origin: "https://evil.test" } });
+  const crossOrigin = await api("PUT", "/v1/me/public-key", { cookie: session, origin: "https://evil.test", body: { publicKey } });
   assert.equal(crossOrigin.status, 403);
+  assert.equal((await api("GET", "/v1/me", { cookie: session, origin: null })).status, 200);
 
-  const noAccess = await call(worker.env, "POST", "/dashboard/session", { headers: { Origin: ORIGIN } });
-  assert.equal(noAccess.status, 401);
+  const viaBearer = await api("PUT", "/v1/me/public-key", { token: admin, origin: null, body: { publicKey } });
+  assert.equal(viaBearer.status, 200);
+  assert.equal((await api("PUT", "/v1/me/public-key", { token: admin, origin: null, body: { publicKey } })).status, 409);
 });
 
-test("the development identity works only on localhost", async () => {
-  const env = { ...worker.env, DEV_ACCESS_EMAIL: "founder@example.com" };
-  const local = await fetchWorker(env)("http://localhost:8787/dashboard/session", {
-    method: "POST",
-    headers: { Origin: "http://localhost:8787" },
-  });
-  assert.equal(local.status, 200);
+test("a signed-in browser approves a CLI device code", async () => {
+  const device = (await api("POST", "/v1/auth/device")).body;
+  const redirect = await api("GET", `/activate?code=${device.userCode}`);
+  assert.equal(redirect.status, 302);
+  assert.equal(redirect.headers.get("Location"), `${ORIGIN}/dashboard/#/activate/${device.userCode}`);
 
-  const remote = await fetchWorker(env)(`${ORIGIN}/dashboard/session`, { method: "POST", headers: { Origin: ORIGIN } });
-  assert.equal(remote.status, 401);
+  const poll = () => api("POST", "/v1/auth/token", { body: { deviceCode: device.deviceCode, deviceName: "ana-mbp" } });
+  assert.deepEqual((await poll()).body, { error: "authorization_pending" });
+
+  const session = sessionFrom((await signIn(ana)).result);
+  assert.equal((await api("POST", "/v1/auth/activate", { body: { code: device.userCode } })).status, 401);
+  assert.equal((await api("POST", "/v1/auth/activate", { cookie: session, body: { code: device.userCode.toLowerCase() } })).status, 200);
+
+  const issued = await poll();
+  const me = await api("GET", "/v1/me", { token: issued.body.token, origin: null });
+  assert.equal(me.body.email, "ana@example.com");
+  assert.deepEqual((await poll()).body, { error: "expired_token" });
 });
 
-function tamperSignature(token: string): string {
-  const [header, payload, signature] = token.split(".");
-  const flipped = (signature[0] === "A" ? "B" : "A") + signature.slice(1);
-  return `${header}.${payload}.${flipped}`;
-}
+test("only organization admins invite, and a new link replaces the old one", async () => {
+  const session = sessionFrom((await signIn(ana)).result);
+  assert.equal((await api("POST", "/v1/users", { cookie: session, body: { email: "x@example.com" } })).status, 403);
 
-async function sessionFor(email: string): Promise<string> {
-  const device = await startDevice();
-  await activate(email, device.userCode);
-  return (await poll(device.deviceCode)).body.token;
-}
+  const first = await invite("bo@example.com");
+  const { users } = (await api("GET", "/v1/users", { token: admin })).body;
+  const bo = users.find((user: any) => user.email === "bo@example.com");
+  assert.equal(bo.hasPasskey, false);
+
+  const renewed = await api("POST", `/v1/users/${bo.id}/invite`, { token: admin });
+  assert.equal((await api("GET", `/v1/invites/${first}`)).status, 404);
+  assert.equal((await api("GET", `/v1/invites/${renewed.body.inviteUrl.split("/join/")[1]}`)).status, 200);
+});
+
+test("signing out ends the browser session", async () => {
+  const session = sessionFrom((await signIn(ana)).result);
+  const out = await api("POST", "/v1/auth/logout", { cookie: session });
+  assert.equal(out.status, 204);
+  assert.match(out.headers.get("Set-Cookie") ?? "", /Max-Age=0/);
+  assert.equal((await api("GET", "/v1/me", { cookie: session })).status, 401);
+});

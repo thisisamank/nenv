@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { getPlatformProxy } from "wrangler";
 import worker, { type Env } from "../src/index.ts";
 import { hashToken } from "../src/auth.ts";
@@ -6,7 +6,6 @@ import { hashToken } from "../src/auth.ts";
 export const REPO = "github.com/acme/backend";
 export const PROJECT_PATH = `/v1/repos/${encodeURIComponent(REPO)}`;
 export const PUBLIC_KEY = btoa(String.fromCharCode(...new Uint8Array(65).fill(4)));
-export const ACCESS = { ACCESS_TEAM_DOMAIN: "acme.cloudflareaccess.com", ACCESS_AUD: "nenv-test-aud" };
 
 export type TestWorker = {
   env: Env;
@@ -18,11 +17,14 @@ export async function startWorker(): Promise<TestWorker> {
     configPath: new URL("../wrangler.jsonc", import.meta.url).pathname,
     persist: false,
   });
-  const env = { ...proxy.env, ...ACCESS };
+  const env = proxy.env;
 
-  const sql = await readFile(new URL("../migrations/0001_init.sql", import.meta.url), "utf8");
-  const statements = sql.split(";").map((s) => s.trim()).filter(Boolean);
-  await env.DB.batch(statements.map((s) => env.DB.prepare(s)));
+  const migrations = new URL("../migrations/", import.meta.url);
+  for (const file of (await readdir(migrations)).sort()) {
+    const sql = await readFile(new URL(file, migrations), "utf8");
+    const statements = sql.split(";").map((s) => s.trim()).filter(Boolean);
+    await env.DB.batch(statements.map((s) => env.DB.prepare(s)));
+  }
 
   return { env, dispose: proxy.dispose };
 }
@@ -63,5 +65,5 @@ export async function call(env: Env, method: string, path: string, options: Call
   const text = await response.text();
   const isJson = response.headers.get("Content-Type")?.includes("json");
 
-  return { status: response.status, body: (isJson ? JSON.parse(text) : text) as any };
+  return { status: response.status, headers: response.headers, body: (isJson ? JSON.parse(text) : text) as any };
 }
