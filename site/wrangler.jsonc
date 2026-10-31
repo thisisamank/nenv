@@ -1,0 +1,23 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "noenv-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "404-page"
+  },
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "noenv.thisisamank.in",
+      "custom_domain": true
+    },
+    {
+      "pattern": "nenv.thisisamank.in",
+      "custom_domain": true
+    }
+  ]
+}

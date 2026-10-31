@@ -1,0 +1,16 @@
+# noenv
+
+> noenv is a self-hosted secrets manager that replaces .env files. Encrypted environment variables load into your shell when you cd into a git repository and unload when you leave. It runs on your own Cloudflare account (one Worker, one D1 database, one KV namespace).
+
+- Values are encrypted on the developer's machine; the server stores only ciphertext.
+- The git origin URL identifies the project. An optional .noenv file selects the environment.
+- Changes from the CLI, the dashboard, or a teammate load at the next shell prompt.
+- Every change is a new version, and any version can be restored.
+- People sign in with passkeys and get reader, editor, or admin roles.
+- Admins can warn about, block, or migrate and delete .env files on team machines.
+
+## Get started
+
+- [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv): one-click deployment
+- [noenv-cli on npm](https://www.npmjs.com/package/noenv-cli): `npm install -g noenv-cli`
+- [Source and README](https://github.com/thisisamank/noenv): setup steps, commands, and design

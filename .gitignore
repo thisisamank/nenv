@@ -2,3 +2,5 @@ node_modules
 dist
 .dev.vars
 .wrangler
+.DS_Store
+brag-output/

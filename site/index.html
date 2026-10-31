@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0c0e">
+<title>noenv — Self-hosted secrets manager that replaces .env files</title>
+<meta name="description" content="noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.">
+<link rel="canonical" href="https://noenv.thisisamank.in/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="noenv">
+<meta property="og:url" content="https://noenv.thisisamank.in/">
+<meta property="og:title" content="noenv — Self-hosted secrets manager that replaces .env files">
+<meta property="og:description" content="noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.">
+<meta property="og:image" content="https://noenv.thisisamank.in/assets/tour.jpg">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:alt" content="A .env file struck through under the line: Stop passing .env files around.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="noenv — Self-hosted secrets manager that replaces .env files">
+<meta name="twitter:description" content="noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.">
+<meta name="twitter:image" content="https://noenv.thisisamank.in/assets/tour.jpg">
+<meta name="twitter:image:alt" content="A .env file struck through under the line: Stop passing .env files around.">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebSite",
+   "@id": "https://noenv.thisisamank.in/#website",
+   "url": "https://noenv.thisisamank.in/",
+   "name": "noenv",
+   "description": "noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.",
+   "inLanguage": "en"
+  },
+  {
+   "@type": "WebPage",
+   "@id": "https://noenv.thisisamank.in/#webpage",
+   "url": "https://noenv.thisisamank.in/",
+   "name": "noenv — Self-hosted secrets manager that replaces .env files",
+   "description": "noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.",
+   "isPartOf": {
+    "@id": "https://noenv.thisisamank.in/#website"
+   },
+   "about": {
+    "@id": "https://noenv.thisisamank.in/#software"
+   },
+   "primaryImageOfPage": {
+    "@type": "ImageObject",
+    "url": "https://noenv.thisisamank.in/assets/tour.jpg",
+    "width": 1920,
+    "height": 1080
+   },
+   "inLanguage": "en"
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://noenv.thisisamank.in/#software",
+   "name": "noenv",
+   "description": "noenv loads encrypted environment variables when you cd into a git repo and unloads them when you leave. Self-hosted on Cloudflare, with passkeys and rollback.",
+   "url": "https://noenv.thisisamank.in/",
+   "applicationCategory": "DeveloperApplication",
+   "operatingSystem": "macOS, Linux",
+   "downloadUrl": "https://www.npmjs.com/package/noenv-cli",
+   "image": "https://noenv.thisisamank.in/assets/tour.jpg",
+   "sameAs": [
+    "https://github.com/thisisamank/noenv",
+    "https://www.npmjs.com/package/noenv-cli"
+   ],
+   "featureList": [
+    "Encrypted on your machine; the server stores only ciphertext",
+    "Secrets load on cd and unload when you leave",
+    "Live updates at the next shell prompt",
+    "Every version kept, with one-click rollback",
+    "Passkey sign-in with reader, editor, and admin roles",
+    ".env policies: warn, block, or migrate and delete",
+    "Self-hosted on your own Cloudflare account"
+   ]
+  },
+  {
+   "@type": "VideoObject",
+   "@id": "https://noenv.thisisamank.in/#tour",
+   "name": "noenv in 40 seconds",
+   "description": "How to move from .env files to noenv: deploy, create a passkey, install the CLI, approve your terminal, and migrate your .env files.",
+   "thumbnailUrl": "https://noenv.thisisamank.in/assets/tour.jpg",
+   "contentUrl": "https://noenv.thisisamank.in/assets/tour.mp4",
+   "uploadDate": "2026-10-31",
+   "duration": "PT42S"
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://noenv.thisisamank.in/#faq",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Does the noenv server see my secrets?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. Values are encrypted on your machine with the environment's public key before they are uploaded. The server and Cloudflare store only ciphertext."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What happens to my existing .env files?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "noenv migrate uploads every value, reads it back to verify it, and only then offers to delete the file. It never overwrites a value your team already set."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Where does noenv run?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "On your own Cloudflare account: one Worker, one D1 database, and one KV namespace. You deploy it with one click."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which shells does noenv support?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "zsh and bash on macOS and Linux. Secrets load when you cd into a git repository that noenv knows, and unload when you leave it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do teammates get access?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "An admin sends an invite link. The teammate creates a passkey and connects their shell, and an admin shares the environment key with noenv grant."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+<link rel="preload" href="assets/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M16 7l3 3M14 9l2 2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H12l-1 8 8.5-11H12z"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.8 2.8 2.6 3 5.2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6z"/></symbol>
+  <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="5.5" r="2"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7.5v9M18 10c0 4-6 3-11.2 7"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 64 64"><path d="M48 46H17a10 10 0 0 1-1.6-19.9A14 14 0 0 1 43 22a11 11 0 0 1 5 24z"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#main"><span class="mark"><svg class="icon"><use href="#i-key"/></svg></span>noenv</a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#tour">Tour</a>
+      <a href="https://github.com/thisisamank/noenv">GitHub</a>
+    </nav>
+    <a class="btn small deploy" href="https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv"><svg class="cloud"><use href="#i-cloud"/></svg>Deploy</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <div class="wrap">
+      <h1>Stop passing <code>.env</code> files around.</h1>
+      <p class="lede">Encrypted environment variables that load when you <code>cd</code> into a repo and disappear when you leave. Hosted on your own Cloudflare account.</p>
+      <div class="actions">
+        <a class="btn deploy" href="https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv"><svg class="cloud"><use href="#i-cloud"/></svg>Deploy to Cloudflare</a>
+        <div class="install"><span>$</span>npm install -g noenv-cli<button class="copy" data-copy="npm install -g noenv-cli" aria-label="Copy install command"><svg class="icon"><use href="#i-copy"/></svg></button></div>
+      </div>
+    </div>
+    <video class="hero-video" src="assets/hero.mp4" poster="assets/hero.webp" autoplay muted loop playsinline aria-label="A teammate saves a new secret version in the dashboard, and the terminal picks it up at the next prompt"></video>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Set up in three steps</h2>
+        <p>No identity provider, no servers to run, nothing to configure per repo.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <h3>Deploy</h3>
+          <p>One click puts noenv on your Cloudflare account. Create your admin passkey on the dashboard.</p>
+          <div class="chips"><span class="chip"><svg class="icon"><use href="#i-check"/></svg>Worker</span><span class="chip"><svg class="icon"><use href="#i-check"/></svg>D1</span><span class="chip"><svg class="icon"><use href="#i-check"/></svg>KV</span></div>
+        </li>
+        <li>
+          <h3>Install and connect</h3>
+          <p>Install the CLI and add two lines to your shell profile.</p>
+          <div class="snippet"><span class="p">$</span> npm install -g noenv-cli
+<span class="k">export</span> NOENV_URL=<span class="m">&lt;your-url&gt;</span>
+<span class="k">eval</span> "$(noenv shell zsh)"</div>
+        </li>
+        <li>
+          <h3><code>cd</code> into a repo</h3>
+          <p>Approve the terminal with your passkey once. From then on, secrets just load.</p>
+          <div class="snippet"><span class="p">~/code ❯</span> cd api
+<span class="p">noenv: loaded 12 secrets</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="migrate">
+    <div class="wrap migrate">
+      <div class="section-head">
+        <h2>Move off <code>.env</code> in one command</h2>
+        <p>The git <code>origin</code> is the project. <code>noenv migrate</code> uploads every value, reads it back to verify, and only then offers to delete the file.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg>Never overwrites a value your team already set</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Keeps the file if anything differs or fails</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Skips <code>.env.example</code></li>
+        </ul>
+      </div>
+      <div class="terminal" role="img" aria-label="Terminal output of noenv init and noenv migrate">
+        <div class="terminal-bar"><i></i><i></i><i></i>zsh</div>
+<pre><span class="p">~/code/api ❯</span> noenv init
+<span class="m">Created project github.com/acme/api</span>
+<span class="m">Created environment development</span>
+<span class="p">~/code/api ❯</span> noenv migrate
+.env: 12 values are stored in NOENV
+Delete .env? [y/N] y
+.env: deleted
+<span class="ok">noenv: loaded 12 secrets for github.com/acme/api (development)</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Everything a team needs, nothing it doesn't</h2>
+      </div>
+      <ul class="features">
+        <li><h3><svg class="icon"><use href="#i-lock"/></svg>Encrypted on your machine</h3><p>Values are sealed before they leave your laptop. The server stores only ciphertext.</p></li>
+        <li><h3><svg class="icon"><use href="#i-bolt"/></svg>Live updates</h3><p>A change from the CLI, the dashboard, or a teammate loads at your next prompt.</p></li>
+        <li><h3><svg class="icon"><use href="#i-history"/></svg>Every version kept</h3><p>Each change is a new version. Roll back with one click.</p></li>
+        <li><h3><svg class="icon"><use href="#i-users"/></svg>Passkeys and roles</h3><p>Invite with a link. Readers load, editors write, admins manage. No passwords.</p></li>
+        <li><h3><svg class="icon"><use href="#i-shield"/></svg><code>.env</code> policies</h3><p>Warn, block, or migrate and delete <code>.env</code> files, and see which devices comply.</p></li>
+        <li><h3><svg class="icon"><use href="#i-branch"/></svg>Every environment</h3><p>Separate keys for <span class="envs"><span class="env dev">development</span><span class="env staging">staging</span><span class="env prod">production</span></span></p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="tour" class="tour">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The 40-second tour</h2>
+      </div>
+      <video src="assets/tour.mp4" poster="assets/tour.jpg" controls preload="none" playsinline></video>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Questions</h2>
+      </div>
+      <div class="faq">
+        <details><summary>Does the noenv server see my secrets?</summary><p>No. Values are encrypted on your machine with the environment's public key before they are uploaded. The server and Cloudflare store only ciphertext.</p></details>
+        <details><summary>What happens to my existing .env files?</summary><p>noenv migrate uploads every value, reads it back to verify it, and only then offers to delete the file. It never overwrites a value your team already set.</p></details>
+        <details><summary>Where does noenv run?</summary><p>On your own Cloudflare account: one Worker, one D1 database, and one KV namespace. You deploy it with one click.</p></details>
+        <details><summary>Which shells does noenv support?</summary><p>zsh and bash on macOS and Linux. Secrets load when you cd into a git repository that noenv knows, and unload when you leave it.</p></details>
+        <details><summary>How do teammates get access?</summary><p>An admin sends an invite link. The teammate creates a passkey and connects their shell, and an admin shares the environment key with noenv grant.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="closing">
+    <div class="wrap">
+      <h2>Your secrets, your Cloudflare account.</h2>
+      <p>Deploy in one click. Delete your last <code>.env</code> today.</p>
+      <div class="actions">
+        <a class="btn deploy" href="https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv"><svg class="cloud"><use href="#i-cloud"/></svg>Deploy to Cloudflare</a>
+        <div class="install"><span>$</span>npm install -g noenv-cli<button class="copy" data-copy="npm install -g noenv-cli" aria-label="Copy install command"><svg class="icon"><use href="#i-copy"/></svg></button></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#main"><span class="mark"><svg class="icon"><use href="#i-key"/></svg></span>noenv</a>
+    <div class="right">
+      <a href="https://github.com/thisisamank/noenv">GitHub</a>
+      <a href="https://www.npmjs.com/package/noenv-cli">npm</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" id="toast">Copied</div>
+
+<script>
+const toast = document.getElementById("toast");
+for (const button of document.querySelectorAll("[data-copy]")) {
+  button.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(button.dataset.copy);
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1400);
+  });
+}
+
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const hero = document.querySelector(".hero-video");
+  hero.removeAttribute("autoplay");
+  hero.pause();
+  hero.controls = true;
+}
+</script>
+</body>
+</html>
