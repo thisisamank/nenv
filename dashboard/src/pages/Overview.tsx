@@ -6,7 +6,7 @@ import { EnvironmentList } from "../components/Environment.tsx";
 import { ErrorLine, Loading, useToast } from "../components/Feedback.tsx";
 import { Icon, type IconName } from "../components/Icon.tsx";
 import { displayName, shortRepo, timeAgo } from "../format.ts";
-import { inviteLink } from "../members.ts";
+import { announceInvite, renewInvite } from "../members.ts";
 import { href } from "../router.ts";
 import type { Device, User } from "../types.ts";
 import { useResource } from "../use-resource.ts";
@@ -29,8 +29,7 @@ export function Overview() {
   const notify = useToast();
 
   const copyInviteLink = async (user: User) => {
-    await navigator.clipboard.writeText(await inviteLink(user.id));
-    notify(`New invite link for ${user.email} copied`);
+    await announceInvite(user.email, await renewInvite(user.id), notify);
   };
   const alerts = [...deviceAlerts(devices.data ?? []), ...userAlerts(users.data ?? [], copyInviteLink)];
 
@@ -174,7 +173,7 @@ function userAlerts(users: User[], copyInviteLink: (user: User) => void): Alert[
           icon: "mail",
           title: `${name} has not joined yet`,
           detail: `Invited ${timeAgo(user.createdAt)}`,
-          action: { label: "Copy invite link", onClick: () => copyInviteLink(user) },
+          action: { label: "Resend invite", onClick: () => copyInviteLink(user) },
         },
       ];
     }

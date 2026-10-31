@@ -103,6 +103,7 @@ Identity:
 - The Deploy to Cloudflare button asks for `ADMIN_EMAIL`. The dashboard then lets only that email create the first admin passkey, and setup closes after the first passkey exists.
 - `npm run setup -- --admin you@example.com` deploys from a local checkout and prints a one-time setup link for the first admin.
 - Admins invite people from the dashboard. An invite creates a one-time link (valid 7 days) that the admin sends. Opening it creates the person's passkey.
+- When the deployment has the `EMAIL` send binding and an `EMAIL_FROM` address, noenv emails the invite link through Cloudflare Email Sending. The link is still returned, so the admin can send it another way. With email on, the first admin's setup link is also emailed to `ADMIN_EMAIL` instead of being claimable by typing the address.
 - A lost passkey is recovered with a new invite link from an admin.
 - The browser session is an HttpOnly, SameSite=Strict cookie. Cookie-authenticated writes must come from the same origin.
 - The CLI approves its device code in the signed-in dashboard (`/activate` redirects there) and then uses a bearer session token.

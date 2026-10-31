@@ -1,5 +1,6 @@
 import { hashToken, randomToken } from "./auth.ts";
 import type { Context, UserContext } from "./context.ts";
+import { sendInviteEmail } from "./email.ts";
 import { identifierParam } from "./guards.ts";
 import { HttpError, json } from "./http.ts";
 
@@ -44,9 +45,17 @@ export async function readInvite({ env, params }: Context): Promise<Response> {
 export async function regenerateInvite(context: UserContext): Promise<Response> {
   const { request, env } = context;
   const userId = identifierParam(context, "userId");
-  const user = await env.DB.prepare("SELECT id FROM users WHERE id = ?").bind(userId).first();
+  const user = await env.DB.prepare("SELECT email FROM users WHERE id = ?").bind(userId).first<{ email: string }>();
   if (!user) {
     throw new HttpError(404, "user not found");
   }
-  return json({ inviteUrl: await createInviteLink(env.DB, request, userId) });
+  return json(await sendInvite(context, userId, user.email));
+}
+
+export async function sendInvite(context: UserContext, userId: string, email: string): Promise<{ inviteUrl: string; emailed: boolean }> {
+  const { request, env } = context;
+  const inviteUrl = await createInviteLink(env.DB, request, userId);
+  const inviter = await env.DB.prepare("SELECT email FROM users WHERE id = ?").bind(context.userId).first<{ email: string }>();
+  const emailed = await sendInviteEmail(env, { to: email, link: inviteUrl, invitedBy: inviter?.email ?? "An admin" });
+  return { inviteUrl, emailed };
 }

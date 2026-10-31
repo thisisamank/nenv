@@ -1,7 +1,7 @@
 import { newId } from "./auth.ts";
 import type { UserContext } from "./context.ts";
 import { HttpError, json, readJson } from "./http.ts";
-import { createInviteLink } from "./invites.ts";
+import { sendInvite } from "./invites.ts";
 import { isPublicKey } from "./sealed.ts";
 
 const EMAIL = /^[^\s@]+@[^\s@]+$/;
@@ -84,7 +84,8 @@ export async function findUser({ request, env }: UserContext): Promise<Response>
   return json({ id: user.id, email: user.email, publicKey: user.public_key });
 }
 
-export async function inviteUser({ request, env }: UserContext): Promise<Response> {
+export async function inviteUser(context: UserContext): Promise<Response> {
+  const { request, env } = context;
   const { email } = await readJson(request);
   if (typeof email !== "string" || email.length > 254 || !EMAIL.test(email)) {
     throw new HttpError(400, "email must be a valid email address");
@@ -98,5 +99,5 @@ export async function inviteUser({ request, env }: UserContext): Promise<Respons
   if (!user) {
     throw new HttpError(409, "this user already exists");
   }
-  return json({ ...user, inviteUrl: await createInviteLink(env.DB, request, user.id) }, 201);
+  return json({ ...user, ...(await sendInvite(context, user.id, user.email)) }, 201);
 }

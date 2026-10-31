@@ -6,6 +6,8 @@ export type Env = {
   DB: D1Database;
   SECRETS: KVNamespace;
   ADMIN_EMAIL?: string;
+  EMAIL?: SendEmail;
+  EMAIL_FROM?: string;
 };
 
 export type Context = {

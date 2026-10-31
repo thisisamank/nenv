@@ -20,13 +20,13 @@ function api(env: TestWorker["env"], method: string, path: string, body?: unknow
 }
 
 test("setup is off when no admin email was set at deploy time", async () => {
-  assert.deepEqual((await api(worker.env, "GET", "/v1/setup")).body, { available: false });
+  assert.deepEqual((await api(worker.env, "GET", "/v1/setup")).body, { available: false, email: false });
   assert.equal((await api(worker.env, "POST", "/v1/setup/options", { email: "a@example.com" })).status, 403);
 });
 
 test("only the deploy-time admin email can create the first passkey, once", async () => {
   const env = { ...worker.env, ADMIN_EMAIL: "Owner@Example.com" };
-  assert.deepEqual((await api(env, "GET", "/v1/setup")).body, { available: true });
+  assert.deepEqual((await api(env, "GET", "/v1/setup")).body, { available: true, email: false });
   assert.equal((await api(env, "POST", "/v1/setup/options", { email: "intruder@example.com" })).status, 403);
 
   const options = await api(env, "POST", "/v1/setup/options", { email: "owner@example.com" });
@@ -38,6 +38,6 @@ test("only the deploy-time admin email can create the first passkey, once", asyn
   const me = await api(env, "GET", "/v1/me", undefined, session);
   assert.deepEqual([me.body.email, me.body.isAdmin], ["owner@example.com", true]);
 
-  assert.deepEqual((await api(env, "GET", "/v1/setup")).body, { available: false });
+  assert.deepEqual((await api(env, "GET", "/v1/setup")).body, { available: false, email: false });
   assert.equal((await api(env, "POST", "/v1/setup/options", { email: "owner@example.com" })).status, 403);
 });

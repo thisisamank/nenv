@@ -5,7 +5,7 @@ import { Avatar } from "../components/Avatar.tsx";
 import { ErrorLine, Loading, useToast } from "../components/Feedback.tsx";
 import { Icon } from "../components/Icon.tsx";
 import { capitalize, displayName, shortRepo } from "../format.ts";
-import { addToProject, announceInvite } from "../members.ts";
+import { addToProject, announceInvite, type Invite } from "../members.ts";
 import type { Role, User } from "../types.ts";
 import { errorMessage, useResource } from "../use-resource.ts";
 
@@ -152,10 +152,8 @@ function InviteForm({ onInvited }: { onInvited: () => void }) {
     setBusy(true);
     setError(undefined);
     try {
-      const inviteUrl = selected
-        ? await addToProject(selected, email, role, true)
-        : (await api<{ inviteUrl: string }>("POST", "/v1/users", { email })).inviteUrl;
-      await announceInvite(email, inviteUrl, notify);
+      const invite = selected ? await addToProject(selected, email, role, true) : await api<Invite>("POST", "/v1/users", { email });
+      await announceInvite(email, invite, notify);
       setEmail("");
       onInvited();
     } catch (caught) {

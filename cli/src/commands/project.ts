@@ -36,8 +36,9 @@ export async function inviteCommand([email]: string[]): Promise<void> {
   if (!email) throw new Error("usage: noenv invite EMAIL");
   const { deployment, token } = await signedIn();
 
-  await api(deployment, "POST", "/v1/users", { token, body: { email } });
-  console.log(`Invited ${email}. They can sign in from the noenv landing page: ${deployment.url}`);
+  const invite = await api<{ inviteUrl: string; emailed: boolean }>(deployment, "POST", "/v1/users", { token, body: { email } });
+  console.log(invite.emailed ? `Invite emailed to ${email}. The link, in case they need it:` : `Invited ${email}. Send them this link:`);
+  console.log(`  ${invite.inviteUrl}`);
 }
 
 export async function grantCommand([email, role]: string[]): Promise<void> {

@@ -12,6 +12,7 @@ import {
   logout,
   registrationOptions,
   registrationVerify,
+  emailSetupLink,
   setupOptions,
   setupStatus,
   setupVerify,
@@ -67,6 +68,7 @@ const routes: Route[] = [
   route("GET", "/v1/setup", setupStatus),
   route("POST", "/v1/setup/options", setupOptions),
   route("POST", "/v1/setup", setupVerify),
+  route("POST", "/v1/setup/email", emailSetupLink),
 
   route("GET", "/v1/me", withUser(getMe)),
   route("POST", "/v1/revisions", withUser(readRevisions)),

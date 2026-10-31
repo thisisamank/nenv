@@ -10,7 +10,8 @@ import { createSession, hashToken, newId } from "./auth.ts";
 import type { Context } from "./context.ts";
 import { clearedSessionCookie, readSessionCookie, sessionCookie } from "./cookies.ts";
 import { HttpError, json, readJson, requireSameOrigin } from "./http.ts";
-import { findInvite, type Invite } from "./invites.ts";
+import { canSendEmail, sendInviteEmail } from "./email.ts";
+import { createInviteLink, findInvite, type Invite } from "./invites.ts";
 
 export const BROWSER_DEVICE = "Browser";
 
@@ -39,7 +40,7 @@ export async function registrationVerify({ request, env }: Context): Promise<Res
 }
 
 export async function setupStatus({ env }: Context): Promise<Response> {
-  return json({ available: await isSetupAvailable(env) });
+  return json({ available: await isSetupAvailable(env), email: canSendEmail(env) });
 }
 
 export async function setupOptions({ request, env }: Context): Promise<Response> {
@@ -53,7 +54,29 @@ export async function setupVerify({ request, env }: Context): Promise<Response> 
   return finishRegistration(request, env, await claimAdmin(env, email), response);
 }
 
-async function isSetupAvailable(env: Context["env"]): Promise<boolean> {
+export async function emailSetupLink({ request, env }: Context): Promise<Response> {
+  requireSameOrigin(request);
+  if (!canSendEmail(env) || !(await isSetupAvailable(env))) {
+    throw new HttpError(409, "setup by email is not available on this deployment");
+  }
+
+  const admin = await upsertAdmin(env);
+  const recent = await env.DB
+    .prepare("SELECT 1 FROM invites WHERE user_id = ? AND expires_at > datetime('now', '+7 days', '-1 minute')")
+    .bind(admin.userId)
+    .first();
+  if (recent) {
+    throw new HttpError(429, "a setup link was sent less than a minute ago, check your inbox");
+  }
+
+  const link = await createInviteLink(env.DB, request, admin.userId);
+  if (!(await sendInviteEmail(env, { to: admin.email, link, invitedBy: null }))) {
+    throw new HttpError(502, "the setup email could not be sent, check the Worker logs");
+  }
+  return json({ sent: true });
+}
+
+export async function isSetupAvailable(env: Context["env"]): Promise<boolean> {
   if (!env.ADMIN_EMAIL) return false;
   return (await env.DB.prepare("SELECT 1 FROM passkeys LIMIT 1").first()) === null;
 }
@@ -63,14 +86,20 @@ async function claimAdmin(env: Context["env"], email: unknown): Promise<Invite> 
   if (!(await isSetupAvailable(env)) || typeof email !== "string" || email.trim().toLowerCase() !== expected) {
     throw new HttpError(403, "setup is closed, or this is not the admin email set at deploy time");
   }
+  if (canSendEmail(env)) {
+    throw new HttpError(403, "this deployment sends the setup link by email, use Email me the setup link");
+  }
+  return upsertAdmin(env);
+}
 
+async function upsertAdmin(env: Context["env"]): Promise<Invite> {
   const user = await env.DB
     .prepare(
       `INSERT INTO users (id, email, is_admin) VALUES (?, ?, 1)
        ON CONFLICT (email) DO UPDATE SET is_admin = 1
        RETURNING id AS userId, email`,
     )
-    .bind(newId("usr"), expected)
+    .bind(newId("usr"), env.ADMIN_EMAIL!.trim().toLowerCase())
     .first<Invite>();
   return user!;
 }

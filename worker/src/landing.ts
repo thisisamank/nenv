@@ -1,15 +1,19 @@
 import type { Context } from "./context.ts";
 import { escapeHtml, htmlPage } from "./pages.ts";
+import { isSetupAvailable } from "./passkeys.ts";
 
 const INSTALL_COMMAND = "npm install -g noenv-cli";
 
-export async function landingPage({ request }: Context): Promise<Response> {
+export async function landingPage({ request, env }: Context): Promise<Response> {
   const origin = new URL(request.url).origin;
+  const setup = (await isSetupAvailable(env))
+    ? `<p><strong>This deployment has no admin yet.</strong> <a href="/dashboard/">Finish setup</a> with the admin email you entered when you deployed.</p>\n`
+    : "";
 
   return htmlPage(
     "noenv",
     `<h1>noenv</h1>
-<p>Secrets for your projects load when you enter the repository and unload when you leave it.</p>
+${setup}<p>Secrets for your projects load when you enter the repository and unload when you leave it.</p>
 <h2>1. Install the CLI</h2>
 <pre>${escapeHtml(INSTALL_COMMAND)}</pre>
 <h2>2. Add noenv to your shell</h2>

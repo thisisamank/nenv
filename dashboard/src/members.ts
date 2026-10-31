@@ -1,25 +1,27 @@
 import { api, ApiError, repoPath } from "./api.ts";
 import type { Role } from "./types.ts";
 
-type FoundUser = { id: string; inviteUrl?: string };
+export type Invite = { inviteUrl: string; emailed: boolean };
 
-export async function addToProject(repo: string, email: string, role: Role, canInviteNewUsers: boolean): Promise<string | undefined> {
+type FoundUser = { id: string } & Partial<Invite>;
+
+export async function addToProject(repo: string, email: string, role: Role, canInviteNewUsers: boolean): Promise<Invite | undefined> {
   const user = await findOrInvite(email.trim().toLowerCase(), canInviteNewUsers);
   await api("PUT", `${repoPath(repo)}/members/${user.id}`, { role });
-  return user.inviteUrl;
+  return user.inviteUrl ? { inviteUrl: user.inviteUrl, emailed: user.emailed ?? false } : undefined;
 }
 
-export async function inviteLink(userId: string): Promise<string> {
-  return (await api<{ inviteUrl: string }>("POST", `/v1/users/${userId}/invite`)).inviteUrl;
+export async function renewInvite(userId: string): Promise<Invite> {
+  return api<Invite>("POST", `/v1/users/${userId}/invite`);
 }
 
-export async function announceInvite(email: string, inviteUrl: string | undefined, notify: (message: string) => void): Promise<void> {
-  if (!inviteUrl) {
+export async function announceInvite(email: string, invite: Invite | undefined, notify: (message: string) => void): Promise<void> {
+  if (!invite) {
     notify(`Added ${email}`);
     return;
   }
-  await navigator.clipboard.writeText(inviteUrl).catch(() => {});
-  notify(`Invite link for ${email} copied. Send it to them.`);
+  await navigator.clipboard.writeText(invite.inviteUrl).catch(() => {});
+  notify(invite.emailed ? `Invite emailed to ${email}. The link is copied too.` : `Invite link for ${email} copied. Send it to them.`);
 }
 
 async function findOrInvite(email: string, canInviteNewUsers: boolean): Promise<FoundUser> {

@@ -13,6 +13,11 @@
       "migrations_dir": "worker/migrations"
     }
   ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
   "kv_namespaces": [
     {
       "binding": "SECRETS"
