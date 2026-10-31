@@ -1,0 +1,20 @@
+{
+  "name": "nenv",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "worker",
+    "cli",
+    "dashboard"
+  ],
+  "scripts": {
+    "test": "node --test 'packages/*/test/*.test.ts' 'worker/test/*.test.ts' 'cli/test/*.test.ts'",
+    "typecheck": "tsc && tsc -p worker && tsc -p cli && tsc -p dashboard",
+    "build": "npm run build -w @nenv/dashboard"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

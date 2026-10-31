@@ -1,0 +1,13 @@
+{
+  "name": "@nenv/config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./names": "./src/names.ts",
+    "./repo": "./src/repo.ts"
+  },
+  "dependencies": {
+    "smol-toml": "^1.9.1"
+  }
+}

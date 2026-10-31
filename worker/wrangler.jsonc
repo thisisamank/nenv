@@ -1,0 +1,27 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "nenv",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "../dashboard/dist"
+  },
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "thisisamank.cloudflareaccess.com",
+    "ACCESS_AUD": "7edd7f30871efe97855ec1cc63d76513b4a4409f094a27fc929864a42b31247c"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nenv",
+      "database_id": "70ef5fc2-8c20-455d-8c93-fa7b6c993afb",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SECRETS",
+      "id": "267ddc0e5434473ebe22dab2f9aededf"
+    }
+  ]
+}
