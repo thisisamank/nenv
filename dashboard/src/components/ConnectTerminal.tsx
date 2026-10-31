@@ -3,7 +3,7 @@ import { Icon } from "./Icon.tsx";
 
 export function ConnectTerminal() {
   const notify = useToast();
-  const lines = `export NENV_URL="${location.origin}"\neval "$(nenv shell zsh)"`;
+  const lines = `export NOENV_URL="${location.origin}"\neval "$(noenv shell zsh)"`;
 
   return (
     <div className="card connect">

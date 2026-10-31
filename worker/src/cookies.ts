@@ -1,4 +1,4 @@
-const SESSION_COOKIE = "nenv_session";
+const SESSION_COOKIE = "noenv_session";
 
 export function sessionCookie(token: string, expiresAt: string): string {
   const expires = new Date(`${expiresAt.replace(" ", "T")}Z`).toUTCString();

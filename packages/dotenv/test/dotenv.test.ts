@@ -12,12 +12,12 @@ import {
   removeIfUnchanged,
   type DotenvPolicy,
   type SecretStore,
-} from "@nenv/dotenv";
+} from "@noenv/dotenv";
 
 const DELETE: DotenvPolicy = { ...DEFAULT_DOTENV_POLICY, mode: "delete" };
 
 async function project(files: Record<string, string>): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "nenv-dotenv-"));
+  const root = await mkdtemp(join(tmpdir(), "noenv-dotenv-"));
   for (const [path, content] of Object.entries(files)) {
     await mkdir(join(root, path, ".."), { recursive: true });
     await writeFile(join(root, path), content);
@@ -62,7 +62,7 @@ test("delete mode migrates values, verifies them, and deletes the files", async 
   assert.equal(existsSync(join(root, ".env")), false);
 });
 
-test("a value that differs from NENV is a conflict and the file is kept", async () => {
+test("a value that differs from NOENV is a conflict and the file is kept", async () => {
   const root = await project({ ".env": "DATABASE_URL=localhost\nNEW_KEY=1" });
   const store = memoryStore({ DATABASE_URL: "postgres://shared" });
 

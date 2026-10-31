@@ -1,5 +1,5 @@
 {
-  "name": "@nenv/config",
+  "name": "@noenv/config",
   "private": true,
   "type": "module",
   "exports": {

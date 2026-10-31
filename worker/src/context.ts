@@ -1,6 +1,6 @@
-import type { Policies, Role } from "@nenv/policy";
+import type { Policies, Role } from "@noenv/policy";
 
-export type { Role } from "@nenv/policy";
+export type { Role } from "@noenv/policy";
 
 export type Env = {
   DB: D1Database;

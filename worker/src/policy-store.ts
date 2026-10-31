@@ -1,4 +1,4 @@
-import { isPolicyName, mergePolicies, type Policies } from "@nenv/policy";
+import { isPolicyName, mergePolicies, type Policies } from "@noenv/policy";
 
 export const ORGANIZATION = "";
 

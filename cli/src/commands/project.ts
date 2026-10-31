@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { exportPublicKey, generateKeyPair, importPublicKey, wrapPrivateKey } from "@nenv/crypto";
+import { exportPublicKey, generateKeyPair, importPublicKey, wrapPrivateKey } from "@noenv/crypto";
 import { api, ApiError, environmentPath, repoPath } from "../api.ts";
 import { fetchBundle } from "../bundle.ts";
 import { inProject, signedIn } from "../context.ts";
@@ -33,16 +33,16 @@ export async function initCommand(): Promise<void> {
 }
 
 export async function inviteCommand([email]: string[]): Promise<void> {
-  if (!email) throw new Error("usage: nenv invite EMAIL");
+  if (!email) throw new Error("usage: noenv invite EMAIL");
   const { deployment, token } = await signedIn();
 
   await api(deployment, "POST", "/v1/users", { token, body: { email } });
-  console.log(`Invited ${email}. They can sign in from the NENV landing page: ${deployment.url}`);
+  console.log(`Invited ${email}. They can sign in from the NOENV landing page: ${deployment.url}`);
 }
 
 export async function grantCommand([email, role]: string[]): Promise<void> {
   if (!email || !ROLES.includes(role ?? "")) {
-    throw new Error("usage: nenv grant EMAIL reader|editor|admin");
+    throw new Error("usage: noenv grant EMAIL reader|editor|admin");
   }
   const { deployment, token, identity, target } = await inProject();
   const user = await findUser(deployment, token, email);
@@ -65,7 +65,7 @@ export async function grantCommand([email, role]: string[]): Promise<void> {
 }
 
 export async function revokeCommand([email]: string[]): Promise<void> {
-  if (!email) throw new Error("usage: nenv revoke EMAIL");
+  if (!email) throw new Error("usage: noenv revoke EMAIL");
   const { deployment, token, target } = await inProject();
   const user = await findUser(deployment, token, email);
 

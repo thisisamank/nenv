@@ -25,7 +25,7 @@ export async function hookEnvCommand([shell]: string[]): Promise<void> {
     openBrowser,
   });
 
-  for (const message of messages) process.stderr.write(`nenv: ${message}\n`);
+  for (const message of messages) process.stderr.write(`noenv: ${message}\n`);
   process.stdout.write(lines.join("\n"));
 }
 

@@ -1,4 +1,4 @@
-import { ENV_VAR_NAME } from "@nenv/config/names";
+import { ENV_VAR_NAME } from "@noenv/config/names";
 import { useState, type FormEvent } from "react";
 import { api, environmentPath } from "../api.ts";
 import { findProject, useApp } from "../app-context.ts";

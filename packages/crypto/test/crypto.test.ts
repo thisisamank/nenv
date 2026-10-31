@@ -10,7 +10,7 @@ import {
   importPublicKey,
   unwrapPrivateKey,
   wrapPrivateKey,
-} from "@nenv/crypto";
+} from "@noenv/crypto";
 
 const context = { projectId: "prj_123", environment: "development", name: "API_KEY" };
 

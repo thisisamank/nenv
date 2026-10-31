@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, realpath, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ConfigError, findProject, normalizeRemoteUrl, parseConfig } from "@nenv/config";
+import { ConfigError, findProject, normalizeRemoteUrl, parseConfig } from "@noenv/config";
 
 const VALID = `
 version = 1
@@ -55,12 +55,12 @@ test("rejects local and unsupported remotes", () => {
 });
 
 test("finds the project from a subdirectory of a git repository", async () => {
-  const root = await realpath(await mkdtemp(join(tmpdir(), "nenv-")));
+  const root = await realpath(await mkdtemp(join(tmpdir(), "noenv-")));
   const nested = join(root, "src", "deep");
   await mkdir(nested, { recursive: true });
   execFileSync("git", ["init", "-q", root]);
   execFileSync("git", ["-C", root, "remote", "add", "origin", "git@github.com:acme/backend.git"]);
-  await writeFile(join(root, ".nenv"), VALID);
+  await writeFile(join(root, ".noenv"), VALID);
 
   assert.deepEqual(await findProject(nested), {
     root,
@@ -72,7 +72,7 @@ test("finds the project from a subdirectory of a git repository", async () => {
 });
 
 test("returns null outside a git repository or without an origin", async () => {
-  const root = await mkdtemp(join(tmpdir(), "nenv-"));
+  const root = await mkdtemp(join(tmpdir(), "noenv-"));
   assert.equal(await findProject(root), null);
 
   execFileSync("git", ["init", "-q", root]);

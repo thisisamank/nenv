@@ -14,7 +14,7 @@ import { findInvite, type Invite } from "./invites.ts";
 
 export const BROWSER_DEVICE = "Browser";
 
-const RP_NAME = "nenv";
+const RP_NAME = "noenv";
 const CHALLENGE_TTL = "+5 minutes";
 
 type Purpose = "register" | "login";
@@ -127,7 +127,7 @@ export async function loginVerify({ request, env }: Context): Promise<Response> 
     .first<StoredPasskey>();
 
   if (!passkey) {
-    throw new HttpError(401, "this passkey is not registered with this nenv deployment");
+    throw new HttpError(401, "this passkey is not registered with this noenv deployment");
   }
 
   const { hostname, origin } = new URL(request.url);

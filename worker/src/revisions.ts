@@ -1,4 +1,4 @@
-import { IDENTIFIER, REPO } from "@nenv/config/names";
+import { IDENTIFIER, REPO } from "@noenv/config/names";
 import type { UserContext } from "./context.ts";
 import { HttpError, json, readJson } from "./http.ts";
 

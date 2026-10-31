@@ -1,4 +1,4 @@
-import type { Policies } from "@nenv/policy";
+import type { Policies } from "@noenv/policy";
 import { useState, type FormEvent } from "react";
 import { api, environmentPath } from "../api.ts";
 import { findProject, useApp } from "../app-context.ts";
@@ -68,7 +68,7 @@ function EnvironmentTabs({ project, current }: { project: Project; current: stri
     event.preventDefault();
     try {
       if (!me.publicKey) {
-        throw new Error("Sign in with the nenv CLI once so nenv can create your key.");
+        throw new Error("Sign in with the noenv CLI once so noenv can create your key.");
       }
       await api("POST", environmentPath(project.repo, name), await createEnvironmentKeys(me.publicKey));
       setAdding(false);

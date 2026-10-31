@@ -18,7 +18,7 @@ export type RequestOptions = {
 };
 
 export async function api<T>(deployment: Deployment, method: string, path: string, options: RequestOptions = {}): Promise<T> {
-  const headers: Record<string, string> = { "X-Nenv-Version": CLI_VERSION };
+  const headers: Record<string, string> = { "X-Noenv-Version": CLI_VERSION };
   if (options.token) headers.Authorization = `Bearer ${options.token}`;
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
 
@@ -36,7 +36,7 @@ export async function api<T>(deployment: Deployment, method: string, path: strin
 
   const data: any = response.status === 204 ? null : await response.json().catch(() => undefined);
   if (data === undefined) {
-    throw new ApiError(response.status, `${deployment.url} did not return a NENV API response (status ${response.status})`);
+    throw new ApiError(response.status, `${deployment.url} did not return a NOENV API response (status ${response.status})`);
   }
   if (!response.ok) {
     throw new ApiError(response.status, data?.error ?? `request failed with status ${response.status}`);

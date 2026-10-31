@@ -8,13 +8,13 @@ export type Deployment = {
 };
 
 export function currentDeployment(env: NodeJS.ProcessEnv = process.env): Deployment | null {
-  if (!env.NENV_URL) return null;
+  if (!env.NOENV_URL) return null;
 
-  const url = URL.parse(env.NENV_URL);
+  const url = URL.parse(env.NOENV_URL);
   if (!url || (url.protocol !== "https:" && url.protocol !== "http:")) {
-    throw new Error("NENV_URL must be an http or https URL");
+    throw new Error("NOENV_URL must be an http or https URL");
   }
 
-  const base = env.NENV_CONFIG_DIR ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "nenv");
+  const base = env.NOENV_CONFIG_DIR ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "noenv");
   return { url: url.origin, dir: join(base, url.host.replace(":", "_")), fetch: globalThis.fetch };
 }

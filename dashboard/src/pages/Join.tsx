@@ -25,11 +25,11 @@ export function Join({ token, onJoined }: { token: string; onJoined: () => void 
     }
   }
 
-  if (invite.loading) return <AuthScreen title="Join nenv"><Loading /></AuthScreen>;
+  if (invite.loading) return <AuthScreen title="Join noenv"><Loading /></AuthScreen>;
   if (!invite.data) return <AuthScreen title="Invite not valid"><ErrorLine message={invite.error} /></AuthScreen>;
 
   return (
-    <AuthScreen title="Join nenv">
+    <AuthScreen title="Join noenv">
       <p className="muted">
         Signing up as <b className="text">{invite.data.email}</b>
       </p>

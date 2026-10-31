@@ -1,5 +1,5 @@
-import { findProject } from "@nenv/config";
-import { IDENTIFIER } from "@nenv/config/names";
+import { findProject } from "@noenv/config";
+import { IDENTIFIER } from "@noenv/config/names";
 
 export type Target = {
   root: string;
@@ -13,9 +13,9 @@ export async function findTarget(cwd: string, env: NodeJS.ProcessEnv): Promise<T
   const project = await findProject(cwd);
   if (!project) return null;
 
-  const environment = env.NENV_ENVIRONMENT || project.environment;
+  const environment = env.NOENV_ENVIRONMENT || project.environment;
   if (!IDENTIFIER.test(environment)) {
-    throw new Error('NENV_ENVIRONMENT must contain only letters, digits, "_" or "-"');
+    throw new Error('NOENV_ENVIRONMENT must contain only letters, digits, "_" or "-"');
   }
   return { ...project, environment };
 }

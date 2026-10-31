@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nenv",
+  "name": "noenv",
   "main": "worker/src/index.ts",
   "compatibility_date": "2026-10-01",
   "assets": {
@@ -9,7 +9,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "nenv",
+      "database_name": "noenv",
       "migrations_dir": "worker/migrations"
     }
   ],

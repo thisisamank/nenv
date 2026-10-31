@@ -40,7 +40,7 @@ export async function clearSession(deployment: Deployment): Promise<void> {
 export async function requireSession(deployment: Deployment): Promise<string> {
   const token = await loadSession(deployment);
   if (!token) {
-    throw new Error("you are not signed in, open a new shell or run `nenv auth`");
+    throw new Error("you are not signed in, open a new shell or run `noenv auth`");
   }
   return token;
 }

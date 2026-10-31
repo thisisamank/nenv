@@ -1,4 +1,4 @@
-import { ENV_VAR_NAME } from "@nenv/config/names";
+import { ENV_VAR_NAME } from "@noenv/config/names";
 import { api, environmentPath } from "../api.ts";
 import { inProject } from "../context.ts";
 import { readSecretValue } from "../prompt.ts";
@@ -17,7 +17,7 @@ export async function secretCommand([action, ...args]: string[]): Promise<void> 
   };
   const handler = handlers[action ?? ""];
   if (!handler) {
-    throw new Error("usage: nenv secret set|list|history|rollback");
+    throw new Error("usage: noenv secret set|list|history|rollback");
   }
   await handler(args);
 }
@@ -70,7 +70,7 @@ async function secretHistory([name]: string[]): Promise<void> {
 async function rollbackSecret([name, version]: string[]): Promise<void> {
   requireName(name);
   if (!/^\d+$/.test(version ?? "")) {
-    throw new Error("usage: nenv secret rollback KEY VERSION");
+    throw new Error("usage: noenv secret rollback KEY VERSION");
   }
 
   const { deployment, token, target } = await inProject();

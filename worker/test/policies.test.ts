@@ -52,11 +52,11 @@ test("policies are validated and only admins can change them", async () => {
 test("an outdated CLI cannot retrieve secrets", async () => {
   await api(admin, "PUT", "/v1/policies/minCliVersion", { value: "1.2.0" });
 
-  const old = await api(reader, "GET", `${ENVIRONMENT_PATH}/bundle`, undefined, { "X-Nenv-Version": "1.1.9" });
+  const old = await api(reader, "GET", `${ENVIRONMENT_PATH}/bundle`, undefined, { "X-Noenv-Version": "1.1.9" });
   assert.equal(old.status, 426);
   assert.match(old.body.error, /1\.2\.0 or newer/);
 
-  const current = await api(reader, "GET", `${ENVIRONMENT_PATH}/bundle`, undefined, { "X-Nenv-Version": "1.2.0" });
+  const current = await api(reader, "GET", `${ENVIRONMENT_PATH}/bundle`, undefined, { "X-Noenv-Version": "1.2.0" });
   assert.equal(current.status, 200);
 
   await api(admin, "DELETE", "/v1/policies/minCliVersion");
@@ -85,7 +85,7 @@ test("new sessions use the session expiry policy", async () => {
 test("clients report compliance and admins see it per device", async () => {
   const files = [{ path: ".env", status: "deleted" }];
   assert.equal(
-    (await api(reader, "POST", `${ENVIRONMENT_PATH}/compliance`, { compliant: true, files }, { "X-Nenv-Version": "0.1.0" })).status,
+    (await api(reader, "POST", `${ENVIRONMENT_PATH}/compliance`, { compliant: true, files }, { "X-Noenv-Version": "0.1.0" })).status,
     204,
   );
   assert.equal((await api(reader, "POST", `${ENVIRONMENT_PATH}/compliance`, { compliant: "yes", files })).status, 400);

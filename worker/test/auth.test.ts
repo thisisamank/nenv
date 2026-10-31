@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { TestAuthenticator } from "./authenticator.ts";
 import { addUser, call, startWorker, type TestWorker } from "./helpers.ts";
 
-const ORIGIN = "https://nenv.test";
+const ORIGIN = "https://noenv.test";
 
 let worker: TestWorker;
 let admin: string;
@@ -17,7 +17,7 @@ after(() => worker.dispose());
 
 function api(method: string, path: string, options: { body?: unknown; cookie?: string; token?: string; origin?: string | null } = {}) {
   const headers: Record<string, string> = {};
-  if (options.cookie) headers.Cookie = `nenv_session=${options.cookie}`;
+  if (options.cookie) headers.Cookie = `noenv_session=${options.cookie}`;
   if (options.origin !== null) headers.Origin = options.origin ?? ORIGIN;
   return call(worker.env, method, path, { body: options.body, token: options.token, headers });
 }
@@ -25,13 +25,13 @@ function api(method: string, path: string, options: { body?: unknown; cookie?: s
 function sessionFrom(response: { headers: Headers }): string {
   const cookie = response.headers.get("Set-Cookie") ?? "";
   assert.match(cookie, /HttpOnly; Secure; SameSite=Strict/);
-  return cookie.match(/nenv_session=([0-9a-f]{64})/)![1]!;
+  return cookie.match(/noenv_session=([0-9a-f]{64})/)![1]!;
 }
 
 async function invite(email: string): Promise<string> {
   const created = await api("POST", "/v1/users", { token: admin, body: { email } });
   assert.equal(created.status, 201);
-  assert.match(created.body.inviteUrl, /^https:\/\/nenv\.test\/dashboard\/#\/join\/[0-9a-f]{64}$/);
+  assert.match(created.body.inviteUrl, /^https:\/\/noenv\.test\/dashboard\/#\/join\/[0-9a-f]{64}$/);
   return created.body.inviteUrl.split("/join/")[1];
 }
 
@@ -52,8 +52,8 @@ async function signIn(authenticator: TestAuthenticator) {
 
 test("the landing page shows shell lines for this deployment", async () => {
   const page = await call(worker.env, "GET", "/");
-  assert.match(page.body, /export NENV_URL=&quot;https:\/\/nenv\.test&quot;/);
-  assert.match(page.body, /nenv shell zsh/);
+  assert.match(page.body, /export NOENV_URL=&quot;https:\/\/noenv\.test&quot;/);
+  assert.match(page.body, /noenv shell zsh/);
 });
 
 const ana = new TestAuthenticator();
@@ -82,7 +82,7 @@ test("a registered passkey signs in, and an assertion cannot be replayed", async
 
 test("an unknown passkey cannot sign in", async () => {
   const stranger = new TestAuthenticator();
-  await stranger.register({ challenge: "x", rp: { id: "nenv.test" }, user: { id: "x" } }, ORIGIN);
+  await stranger.register({ challenge: "x", rp: { id: "noenv.test" }, user: { id: "x" } }, ORIGIN);
   assert.equal((await signIn(stranger)).result.status, 401);
 });
 

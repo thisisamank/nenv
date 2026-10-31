@@ -1,4 +1,4 @@
-import type { Sealed } from "@nenv/crypto";
+import type { Sealed } from "@noenv/crypto";
 import { HttpError } from "./http.ts";
 
 const MAX_CIPHERTEXT_LENGTH = 100_000;

@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { exportPrivateKey, exportPublicKey, generateKeyPair, importPrivateKey } from "@nenv/crypto";
+import { exportPrivateKey, exportPublicKey, generateKeyPair, importPrivateKey } from "@noenv/crypto";
 import { api } from "./api.ts";
 import type { Deployment } from "./deployment.ts";
 import { readJsonFile, writeJsonFile } from "./files.ts";
@@ -33,7 +33,7 @@ export async function ensureIdentity(deployment: Deployment, token: string): Pro
 
   if (local && me.publicKey === local.publicKey) return local;
   if (me.publicKey) {
-    throw new Error(`your NENV key was registered on another device, copy ${identityPath(deployment)} from that device`);
+    throw new Error(`your NOENV key was registered on another device, copy ${identityPath(deployment)} from that device`);
   }
 
   const identity = local ?? (await createIdentity(deployment));

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { TestAuthenticator } from "./authenticator.ts";
 import { call, startWorker, type TestWorker } from "./helpers.ts";
 
-const ORIGIN = "https://nenv.test";
+const ORIGIN = "https://noenv.test";
 
 let worker: TestWorker;
 
@@ -15,7 +15,7 @@ after(() => worker.dispose());
 
 function api(env: TestWorker["env"], method: string, path: string, body?: unknown, cookie?: string) {
   const headers: Record<string, string> = { Origin: ORIGIN };
-  if (cookie) headers.Cookie = `nenv_session=${cookie}`;
+  if (cookie) headers.Cookie = `noenv_session=${cookie}`;
   return call(env, method, path, { body, headers });
 }
 
@@ -34,7 +34,7 @@ test("only the deploy-time admin email can create the first passkey, once", asyn
   const created = await api(env, "POST", "/v1/setup", { email: "owner@example.com", response });
   assert.equal(created.status, 200);
 
-  const session = created.headers.get("Set-Cookie")!.match(/nenv_session=([0-9a-f]{64})/)![1];
+  const session = created.headers.get("Set-Cookie")!.match(/noenv_session=([0-9a-f]{64})/)![1];
   const me = await api(env, "GET", "/v1/me", undefined, session);
   assert.deepEqual([me.body.email, me.body.isAdmin], ["owner@example.com", true]);
 

@@ -1,5 +1,5 @@
 import { relative } from "node:path";
-import type { EnforcementResult, FileOutcome } from "@nenv/dotenv";
+import type { EnforcementResult, FileOutcome } from "@noenv/dotenv";
 import { api, environmentPath } from "./api.ts";
 import type { Deployment } from "./deployment.ts";
 import type { Target } from "./target.ts";
@@ -7,11 +7,11 @@ import type { Target } from "./target.ts";
 const DESCRIPTIONS: Record<FileOutcome["status"], string> = {
   found: "found",
   invalid: "kept, it has invalid variable names",
-  conflict: "kept, its values differ from NENV",
+  conflict: "kept, its values differ from NOENV",
   failed: "kept, it could not be migrated",
-  migrated: "migrated to NENV",
+  migrated: "migrated to NOENV",
   changed: "kept, it changed during migration",
-  deleted: "migrated to NENV and deleted",
+  deleted: "migrated to NOENV and deleted",
 };
 
 export function describeOutcome(target: Target, outcome: FileOutcome): string {

@@ -1,10 +1,10 @@
 {
-  "name": "nenv-cli",
+  "name": "noenv-cli",
   "version": "0.1.1",
-  "description": "Encrypted environment variables that load when you cd into a repo. CLI for nenv.",
+  "description": "Encrypted environment variables that load when you cd into a repo. CLI for noenv.",
   "type": "module",
   "bin": {
-    "nenv": "dist/nenv.js"
+    "noenv": "dist/noenv.js"
   },
   "files": [
     "dist"
@@ -14,10 +14,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thisisamank/nenv.git",
+    "url": "git+https://github.com/thisisamank/noenv.git",
     "directory": "cli"
   },
-  "homepage": "https://github.com/thisisamank/nenv#readme",
+  "homepage": "https://github.com/thisisamank/noenv#readme",
   "keywords": [
     "secrets",
     "env",
@@ -26,15 +26,15 @@
     "cli"
   ],
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/nenv.js",
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/noenv.js",
     "prepublishOnly": "node ../scripts/check-npm-account.ts && npm run build"
   },
   "devDependencies": {
-    "@nenv/config": "*",
-    "@nenv/crypto": "*",
-    "@nenv/dotenv": "*",
-    "@nenv/policy": "*",
-    "@nenv/worker": "*",
+    "@noenv/config": "*",
+    "@noenv/crypto": "*",
+    "@noenv/dotenv": "*",
+    "@noenv/policy": "*",
+    "@noenv/worker": "*",
     "esbuild": "^0.28.2"
   }
 }

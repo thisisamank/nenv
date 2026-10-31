@@ -5,17 +5,17 @@ import { grantCommand, initCommand, inviteCommand, revokeCommand } from "./comma
 import { secretCommand } from "./commands/secret.ts";
 import { hookEnvCommand, shellCommand, watchCommand } from "./commands/shell.ts";
 
-const USAGE = `usage: nenv <command>
+const USAGE = `usage: noenv <command>
 
   shell zsh|bash             print the shell hook for your shell profile
-  auth                       sign in to the deployment in NENV_URL
+  auth                       sign in to the deployment in NOENV_URL
   status                     show the deployment, user, and project
   init                       create the project and environment for this repository
   secret set KEY             save a secret (the value is read without echo)
   secret list                list secrets in this environment
   secret history KEY         list the versions of a secret
   secret rollback KEY VER    restore an older version of a secret
-  migrate                    move .env files of this repository into NENV
+  migrate                    move .env files of this repository into NOENV
   invite EMAIL               invite a user to this deployment
   grant EMAIL ROLE           give a user access to this project and environment
   revoke EMAIL               remove a user from this project
@@ -46,6 +46,6 @@ if (!command) {
 try {
   await command(args);
 } catch (error) {
-  process.stderr.write(`nenv: ${error instanceof Error ? error.message : "unknown error"}\n`);
+  process.stderr.write(`noenv: ${error instanceof Error ? error.message : "unknown error"}\n`);
   process.exit(1);
 }

@@ -8,7 +8,7 @@ import {
   importPublicKey,
   unwrapPrivateKey,
   wrapPrivateKey,
-} from "@nenv/crypto";
+} from "@noenv/crypto";
 import { addUser, call, PROJECT_PATH, REPO, startWorker, type TestWorker } from "./helpers.ts";
 
 const ENVIRONMENT_PATH = `${PROJECT_PATH}/environments/development`;

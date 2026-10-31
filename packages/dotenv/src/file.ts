@@ -1,6 +1,6 @@
 import { lstat, readFile, unlink } from "node:fs/promises";
 import { parseEnv } from "node:util";
-import { ENV_VAR_NAME } from "@nenv/config/names";
+import { ENV_VAR_NAME } from "@noenv/config/names";
 
 export type DotenvFile = {
   path: string;

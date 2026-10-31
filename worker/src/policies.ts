@@ -1,4 +1,4 @@
-import { isPolicyName, PolicyError, validatePolicy, type PolicyName, type PolicyScope } from "@nenv/policy";
+import { isPolicyName, PolicyError, validatePolicy, type PolicyName, type PolicyScope } from "@noenv/policy";
 import type { EnvironmentContext, ProjectContext, UserContext } from "./context.ts";
 import { HttpError, json, readJson } from "./http.ts";
 import { ORGANIZATION, policyRows, toLayer } from "./policy-store.ts";

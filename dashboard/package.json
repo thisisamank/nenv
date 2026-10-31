@@ -1,5 +1,5 @@
 {
-  "name": "@nenv/dashboard",
+  "name": "@noenv/dashboard",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,9 @@
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
-    "@nenv/config": "*",
-    "@nenv/crypto": "*",
-    "@nenv/policy": "*",
+    "@noenv/config": "*",
+    "@noenv/crypto": "*",
+    "@noenv/policy": "*",
     "@phosphor-icons/react": "^2.1.10",
     "@simplewebauthn/browser": "^14.0.0",
     "react": "^19.3.1",

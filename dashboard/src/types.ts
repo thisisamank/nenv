@@ -1,4 +1,4 @@
-import type { Role } from "@nenv/policy";
+import type { Role } from "@noenv/policy";
 
 export type { Role };
 

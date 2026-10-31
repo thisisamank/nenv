@@ -12,7 +12,7 @@ import { errorMessage, useResource } from "../use-resource.ts";
 type TeamRow = { user: User; project: User["projects"][number] | null };
 
 const ROLES: Role[] = ["reader", "editor", "admin"];
-const KEY_SHARING_NOTE = "Sharing keys from the browser needs device keys, which are not built yet. Use `nenv grant` for now.";
+const KEY_SHARING_NOTE = "Sharing keys from the browser needs device keys, which are not built yet. Use `noenv grant` for now.";
 
 export function Team() {
   const { projects } = useApp();

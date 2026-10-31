@@ -1,4 +1,4 @@
-import { normalizeRemoteUrl } from "@nenv/config/repo";
+import { normalizeRemoteUrl } from "@noenv/config/repo";
 import { useState, type FormEvent } from "react";
 import { api, environmentPath } from "../api.ts";
 import { useApp } from "../app-context.ts";

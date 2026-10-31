@@ -1,4 +1,4 @@
-import { compareVersions, mergePolicies, type Policies } from "@nenv/policy";
+import { compareVersions, mergePolicies, type Policies } from "@noenv/policy";
 import { useState } from "react";
 import { api } from "../api.ts";
 import { useApp } from "../app-context.ts";

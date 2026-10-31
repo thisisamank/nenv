@@ -13,7 +13,7 @@ export type CommandContext = {
 export function requireDeployment(): Deployment {
   const deployment = currentDeployment();
   if (!deployment) {
-    throw new Error("NENV_URL is not set, add the lines from your NENV landing page to your shell profile");
+    throw new Error("NOENV_URL is not set, add the lines from your NOENV landing page to your shell profile");
   }
   return deployment;
 }

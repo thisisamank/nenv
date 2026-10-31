@@ -44,7 +44,7 @@ export function App() {
     return <Join token={route.token} onJoined={me.reload} />;
   }
   if (!me.data) {
-    if (me.loading) return <div className="boot"><Loading label="Opening nenv" /></div>;
+    if (me.loading) return <div className="boot"><Loading label="Opening noenv" /></div>;
     if (me.error && me.status !== 401) return <div className="boot"><p className="error-text">{me.error}</p></div>;
     return <Login onSignedIn={me.reload} />;
   }

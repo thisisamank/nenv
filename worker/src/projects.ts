@@ -1,4 +1,4 @@
-import { REPO } from "@nenv/config/names";
+import { REPO } from "@noenv/config/names";
 import { newId } from "./auth.ts";
 import type { EnvironmentContext, ProjectContext, Role, UserContext } from "./context.ts";
 import { identifierParam } from "./guards.ts";

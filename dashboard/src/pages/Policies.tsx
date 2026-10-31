@@ -1,4 +1,4 @@
-import { DEFAULT_POLICIES, mergePolicies, type DotenvMode, type Policies as PolicySet, type Role } from "@nenv/policy";
+import { DEFAULT_POLICIES, mergePolicies, type DotenvMode, type Policies as PolicySet, type Role } from "@noenv/policy";
 import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { api, environmentPath, repoPath } from "../api.ts";
 import { findProject, useApp } from "../app-context.ts";
@@ -13,7 +13,7 @@ type Layer = Partial<PolicySet>;
 const MODES: { value: DotenvMode; title: string; detail: string; icon: IconName }[] = [
   { value: "warn", title: "Warn", detail: "Show a notice", icon: "bell" },
   { value: "block", title: "Block", detail: "Stop loading secrets", icon: "ban" },
-  { value: "migrate", title: "Migrate", detail: "Ask to move into nenv", icon: "arrow" },
+  { value: "migrate", title: "Migrate", detail: "Ask to move into noenv", icon: "arrow" },
   { value: "delete", title: "Delete", detail: "Migrate, then remove", icon: "trash" },
 ];
 const SESSION_OPTIONS = [24, 72, 168, 336, 720];

@@ -1,5 +1,5 @@
-import { encryptSecret } from "@nenv/crypto";
-import type { SecretStore } from "@nenv/dotenv";
+import { encryptSecret } from "@noenv/crypto";
+import type { SecretStore } from "@noenv/dotenv";
 import { api, environmentPath } from "./api.ts";
 import { fetchBundle, type Bundle } from "./bundle.ts";
 import type { Deployment } from "./deployment.ts";

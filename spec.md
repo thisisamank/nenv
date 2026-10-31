@@ -1,4 +1,4 @@
-# NENV — Minimal Technical Specification
+# NOENV — Minimal Technical Specification
 
 **Version:** 0.1  
 **Type:** Open-source, self-hosted secret manager  
@@ -6,13 +6,13 @@
 
 ## 1. Overview
 
-NENV replaces `.env` files with an encrypted, centrally managed secret system.
+NOENV replaces `.env` files with an encrypted, centrally managed secret system.
 
 It combines automatic environment variable injection with self-hosted secret management.
 
 - Secrets are encrypted locally. Cloudflare KV serves the latest values; Cloudflare D1 keeps all versions.
-- Each team deploys NENV to its own Cloudflare account.
-- A shell hook loads project secrets when a developer enters a git repository that NENV knows.
+- Each team deploys NOENV to its own Cloudflare account.
+- A shell hook loads project secrets when a developer enters a git repository that NOENV knows.
 - Secrets are removed from the shell when the developer leaves the project.
 - Administrators manage users, permissions, policies, and secret versions.
 
@@ -46,7 +46,7 @@ D1 maps each normalized origin to an internal project ID. When a repository move
 
 A repository without an `origin` remote, or with an unknown origin, loads no secrets.
 
-A project can contain an optional `.nenv` file at the repository root, committed to git:
+A project can contain an optional `.noenv` file at the repository root, committed to git:
 
 ```toml
 version = 1
@@ -56,50 +56,50 @@ environment = "development"
 required = ["DATABASE_URL", "API_KEY"]
 ```
 
-- `environment` selects the environment. The default is `development`. The `NENV_ENVIRONMENT` variable overrides it for one shell.
+- `environment` selects the environment. The default is `development`. The `NOENV_ENVIRONMENT` variable overrides it for one shell.
 - `secrets.required` lists the secrets the project needs.
 - The file contains references only. It never contains secret values.
 
 ## 4. Developer Workflow
 
-There is no `nenv login` or `nenv hook install` step. Setup is a shell configuration change.
+There is no `noenv login` or `noenv hook install` step. Setup is a shell configuration change.
 
-1. The developer opens the landing page of the team's NENV deployment (for example `https://nenv.<team>.workers.dev`).
+1. The developer opens the landing page of the team's NOENV deployment (for example `https://noenv.<team>.workers.dev`).
 2. The landing page shows a one-time CLI install command and the shell lines for Zsh and Bash. The deployment URL is already filled in.
 3. The developer adds the lines to `~/.zshrc` or `~/.bashrc`:
 
 ```bash
-export NENV_URL="https://nenv.<team>.workers.dev"
-eval "$(nenv shell zsh)"
+export NOENV_URL="https://noenv.<team>.workers.dev"
+eval "$(noenv shell zsh)"
 ```
 
-4. Each new shell checks for a valid session with `NENV_URL`. If there is no valid session, the shell starts the authentication flow automatically.
+4. Each new shell checks for a valid session with `NOENV_URL`. If there is no valid session, the shell starts the authentication flow automatically.
 5. After authentication, the shell loads and unloads project secrets by directory:
 
 ```bash
 cd ~/projects/backend
-# NENV loads backend secrets
+# NOENV loads backend secrets
 
 npm run dev
 # Application accesses secrets normally
 
 cd ..
-# NENV removes backend secrets
+# NOENV removes backend secrets
 ```
 
-Each team can point `NENV_URL` at its own deployment. A developer can change the URL to switch deployments.
+Each team can point `NOENV_URL` at its own deployment. A developer can change the URL to switch deployments.
 
 Authentication requirements:
 
 - Use a device authorization flow: print a URL and a short code, then open the browser if possible.
 - Do not block shell startup. The prompt stays usable while authentication is pending.
 - Run only one authentication flow at a time when several terminals open together.
-- Store the session per `NENV_URL`, so several deployments can coexist.
-- Never fetch and evaluate remote shell code at shell startup. `nenv shell` prints a hook that ships with the installed CLI.
+- Store the session per `NOENV_URL`, so several deployments can coexist.
+- Never fetch and evaluate remote shell code at shell startup. `noenv shell` prints a hook that ships with the installed CLI.
 
 Identity:
 
-- People sign in with passkeys. NENV needs no identity provider, SSO, or Cloudflare Access setup.
+- People sign in with passkeys. NOENV needs no identity provider, SSO, or Cloudflare Access setup.
 - The Deploy to Cloudflare button asks for `ADMIN_EMAIL`. The dashboard then lets only that email create the first admin passkey, and setup closes after the first passkey exists.
 - `npm run setup -- --admin you@example.com` deploys from a local checkout and prints a one-time setup link for the first admin.
 - Admins invite people from the dashboard. An invite creates a one-time link (valid 7 days) that the admin sends. Opening it creates the person's passkey.
@@ -162,12 +162,12 @@ Initial policy support:
 |---|---|
 | `.env` detection | Detect existing environment files |
 | `.env` enforcement | Warn, block activation, require migration, or delete automatically |
-| CLI version | Require a minimum NENV version |
+| CLI version | Require a minimum NOENV version |
 | Session expiry | Require periodic reauthentication |
 | Environment access | Restrict access by user or role |
 | Secret caching | Control local secret persistence |
 
-Policies are stored centrally and evaluated by NENV clients.
+Policies are stored centrally and evaluated by NOENV clients.
 
 Clients report compliance status to the dashboard.
 
@@ -179,7 +179,7 @@ When prohibited `.env` files are detected:
 
 1. Detect matching files within the git repository.
 2. Block activation when required by policy.
-3. Offer secure migration to NENV. In `delete` mode, migrate without a prompt.
+3. Offer secure migration to NOENV. In `delete` mode, migrate without a prompt.
 4. Encrypt and upload secrets.
 5. Verify successful migration.
 6. Remove the files:
@@ -190,11 +190,11 @@ When prohibited `.env` files are detected:
 Automatic deletion (`delete` mode) has these limits:
 
 - Delete a file only after every value in it is uploaded and verified by a decryption round trip.
-- Never overwrite an existing NENV secret during migration. If a `.env` value differs from the NENV value, report a conflict, keep the file, and block secret loading.
+- Never overwrite an existing NOENV secret during migration. If a `.env` value differs from the NOENV value, report a conflict, keep the file, and block secret loading.
 - Do not delete a file that changed after migration.
 - Do not enter nested git repositories (for example vendored dependencies) or `node_modules`.
 - If migration or verification fails, keep the file and block secret loading.
-- Delete only regular files that match the policy patterns in the directory tree of a git repository that NENV knows.
+- Delete only regular files that match the policy patterns in the directory tree of a git repository that NOENV knows.
 - Never follow symbolic links and never delete directories.
 - Never scan outside that directory tree.
 - Report each deleted path (never its contents) to the dashboard.
@@ -218,41 +218,41 @@ The Worker serves the dashboard under `/dashboard/`. People sign in with their p
 
 - The dashboard never decrypts secrets. It writes new values by sealing them to the environment public key in the browser.
 - Creating an environment in the browser wraps its private key for the creator's registered public key.
-- Sharing an environment key with another member needs a private key in the browser. Until per-device keys exist, key sharing is a CLI action (`nenv grant`).
+- Sharing an environment key with another member needs a private key in the browser. Until per-device keys exist, key sharing is a CLI action (`noenv grant`).
 
 
 ## 9. CLI Commands
 
 ```bash
-nenv shell zsh|bash
-nenv init
-nenv status
+noenv shell zsh|bash
+noenv init
+noenv status
 
-nenv secret set KEY
-nenv secret list
-nenv secret rollback KEY VERSION
+noenv secret set KEY
+noenv secret list
+noenv secret rollback KEY VERSION
 
-nenv migrate
+noenv migrate
 ```
 
-`nenv shell` prints the shell hook for the given shell. The hook starts authentication when no valid session exists. Developers do not run separate login or hook install commands.
+`noenv shell` prints the shell hook for the given shell. The hook starts authentication when no valid session exists. Developers do not run separate login or hook install commands.
 
 Secret entry must not expose values through terminal echo or command-line arguments.
 
 ## 10. Security Requirements
 
-- No plaintext secret files created by NENV.
-- No secret values in NENV logs or normal terminal output.
+- No plaintext secret files created by NOENV.
+- No secret values in NOENV logs or normal terminal output.
 - No plaintext secret values stored in Cloudflare.
 - No plaintext secret caching on disk.
-- No execution of arbitrary shell code from `.nenv`.
+- No execution of arbitrary shell code from `.noenv`.
 - No automatic destructive filesystem operations, except the admin-enforced `.env` deletion in §7, within its limits.
 - Restore previous shell variables on project exit.
 - Enforce authorization and applicable policies before retrieval.
 - Use D1 for authoritative permissions and version pointers; account for KV eventual consistency.
 - Support recovery of encryption keys before production use.
 
-**Threat model:** NENV prevents accidental secret exposure. It does not prevent an authorized developer or application from deliberately inspecting injected environment variables.
+**Threat model:** NOENV prevents accidental secret exposure. It does not prevent an authorized developer or application from deliberately inspecting injected environment variables.
 
 ## 11. MVP Scope
 
@@ -260,7 +260,7 @@ The MVP must support:
 
 1. One-click deployment to Cloudflare (Deploy to Cloudflare button), or one command from a checkout (`npm run setup -- --admin you@example.com`).
 2. Landing page with CLI install and shell setup, and automatic authentication on shell start.
-3. `.nenv` project configuration.
+3. `.noenv` project configuration.
 4. Automatic directory-based secret injection and removal.
 5. Client-side encryption and decryption.
 6. Multiple projects and environments.
@@ -273,4 +273,4 @@ The MVP must support:
 
 ---
 
-**Core principle:** NENV makes secrets available to authorized applications automatically, without requiring developers to create, copy, or manage plaintext `.env` files.
+**Core principle:** NOENV makes secrets available to authorized applications automatically, without requiring developers to create, copy, or manage plaintext `.env` files.

@@ -1,5 +1,5 @@
 {
-  "name": "@nenv/crypto",
+  "name": "@noenv/crypto",
   "private": true,
   "type": "module",
   "exports": "./src/index.ts"

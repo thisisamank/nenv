@@ -1,5 +1,5 @@
-import { decryptSecret, importPublicKey, unwrapPrivateKey, type Sealed } from "@nenv/crypto";
-import type { Policies } from "@nenv/policy";
+import { decryptSecret, importPublicKey, unwrapPrivateKey, type Sealed } from "@noenv/crypto";
+import type { Policies } from "@noenv/policy";
 import { api, environmentPath } from "./api.ts";
 import type { Deployment } from "./deployment.ts";
 

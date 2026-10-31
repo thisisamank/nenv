@@ -1,29 +1,29 @@
 export type Shell = "zsh" | "bash";
 
 const HOOKS: Record<Shell, string> = {
-  zsh: `_nenv_hook() {
+  zsh: `_noenv_hook() {
   local revision=""
-  [[ -n "$_NENV_REV_FILE" && -r "$_NENV_REV_FILE" ]] && revision="$(<"$_NENV_REV_FILE")"
-  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" || "$revision" != "$_NENV_REV" ]]; then
-    _NENV_PWD="$PWD"
-    eval "$(printf '%s' "$_NENV_STATE" | command nenv hook-env zsh)"
+  [[ -n "$_NOENV_REV_FILE" && -r "$_NOENV_REV_FILE" ]] && revision="$(<"$_NOENV_REV_FILE")"
+  if [[ "$PWD" != "$_NOENV_PWD" || -n "$_NOENV_RETRY" || "$revision" != "$_NOENV_REV" ]]; then
+    _NOENV_PWD="$PWD"
+    eval "$(printf '%s' "$_NOENV_STATE" | command noenv hook-env zsh)"
   fi
 }
 typeset -ag precmd_functions chpwd_functions
-if (( ! \${precmd_functions[(I)_nenv_hook]} )); then precmd_functions=(_nenv_hook $precmd_functions); fi
-if (( ! \${chpwd_functions[(I)_nenv_hook]} )); then chpwd_functions=(_nenv_hook $chpwd_functions); fi
+if (( ! \${precmd_functions[(I)_noenv_hook]} )); then precmd_functions=(_noenv_hook $precmd_functions); fi
+if (( ! \${chpwd_functions[(I)_noenv_hook]} )); then chpwd_functions=(_noenv_hook $chpwd_functions); fi
 `,
-  bash: `_nenv_hook() {
+  bash: `_noenv_hook() {
   local previous_exit=$? revision=""
-  [[ -n "$_NENV_REV_FILE" && -r "$_NENV_REV_FILE" ]] && revision="$(<"$_NENV_REV_FILE")"
-  if [[ "$PWD" != "$_NENV_PWD" || -n "$_NENV_RETRY" || "$revision" != "$_NENV_REV" ]]; then
-    _NENV_PWD="$PWD"
-    eval "$(printf '%s' "$_NENV_STATE" | command nenv hook-env bash)"
+  [[ -n "$_NOENV_REV_FILE" && -r "$_NOENV_REV_FILE" ]] && revision="$(<"$_NOENV_REV_FILE")"
+  if [[ "$PWD" != "$_NOENV_PWD" || -n "$_NOENV_RETRY" || "$revision" != "$_NOENV_REV" ]]; then
+    _NOENV_PWD="$PWD"
+    eval "$(printf '%s' "$_NOENV_STATE" | command noenv hook-env bash)"
   fi
   return $previous_exit
 }
-if [[ ";\${PROMPT_COMMAND:-};" != *";_nenv_hook;"* ]]; then
-  PROMPT_COMMAND="_nenv_hook\${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+if [[ ";\${PROMPT_COMMAND:-};" != *";_noenv_hook;"* ]]; then
+  PROMPT_COMMAND="_noenv_hook\${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
 `,
 };

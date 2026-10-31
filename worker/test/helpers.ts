@@ -61,7 +61,7 @@ export async function call(env: Env, method: string, path: string, options: Call
   if (options.token) headers.Authorization = `Bearer ${options.token}`;
 
   const body = options.body instanceof URLSearchParams || options.body === undefined ? options.body : JSON.stringify(options.body);
-  const response = await fetchWorker(env)(`https://nenv.test${path}`, { method, headers, body });
+  const response = await fetchWorker(env)(`https://noenv.test${path}`, { method, headers, body });
   const text = await response.text();
   const isJson = response.headers.get("Content-Type")?.includes("json");
 

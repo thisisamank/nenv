@@ -30,7 +30,7 @@ export function Layout({ me, route, attention, onSignedOut, children }: LayoutPr
           <span className="brand-mark">
             <Icon name="key" />
           </span>
-          nenv
+          noenv
         </div>
         {NAV.filter((item) => me.isAdmin || !item.adminOnly).map((item) => (
           <a key={item.page} className="nav-item" href={href(item.route)} aria-current={item.page === current ? "page" : undefined}>

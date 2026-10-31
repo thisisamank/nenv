@@ -1,5 +1,5 @@
-import { ENV_VAR_NAME, IDENTIFIER, REPO } from "@nenv/config/names";
-import { compareVersions, type Policies } from "@nenv/policy";
+import { ENV_VAR_NAME, IDENTIFIER, REPO } from "@noenv/config/names";
+import { compareVersions, type Policies } from "@noenv/policy";
 import { authenticate } from "./auth.ts";
 import type { Context, EnvironmentContext, Handler, ProjectContext, Role, UserContext } from "./context.ts";
 import { HttpError } from "./http.ts";
@@ -9,7 +9,7 @@ const RANK: Record<Role, number> = { reader: 1, editor: 2, admin: 3 };
 
 const ROLE_SQL = "CASE WHEN u.is_admin = 1 THEN 'admin' ELSE m.role END AS role";
 
-export const CLI_VERSION_HEADER = "X-Nenv-Version";
+export const CLI_VERSION_HEADER = "X-Noenv-Version";
 
 export function withUser(handle: Handler<UserContext>): Handler {
   return async (context) => {
@@ -118,7 +118,7 @@ function safeDecode(value: string): string {
 function requireCliVersion(request: Request, policies: Policies): void {
   const version = request.headers.get(CLI_VERSION_HEADER);
   if (policies.minCliVersion && version !== null && compareVersions(version, policies.minCliVersion) < 0) {
-    throw new HttpError(426, `NENV CLI ${policies.minCliVersion} or newer is required, you have ${version}`);
+    throw new HttpError(426, `NOENV CLI ${policies.minCliVersion} or newer is required, you have ${version}`);
   }
 }
 

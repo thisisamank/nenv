@@ -1,4 +1,4 @@
-import { encryptSecret, exportPublicKey, generateKeyPair, importPublicKey, wrapPrivateKey, type Sealed } from "@nenv/crypto";
+import { encryptSecret, exportPublicKey, generateKeyPair, importPublicKey, wrapPrivateKey, type Sealed } from "@noenv/crypto";
 import type { Project } from "./types.ts";
 
 export async function sealSecret(project: Project, environment: string, name: string, value: string): Promise<Sealed> {

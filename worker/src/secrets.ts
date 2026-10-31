@@ -1,4 +1,4 @@
-import type { Sealed } from "@nenv/crypto";
+import type { Sealed } from "@noenv/crypto";
 import type { EnvironmentContext } from "./context.ts";
 import { secretNameParam } from "./guards.ts";
 import { HttpError, json, readJson } from "./http.ts";

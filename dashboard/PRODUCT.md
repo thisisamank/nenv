@@ -13,7 +13,7 @@ web
 
 ## Product Purpose
 
-NENV replaces `.env` files with encrypted secrets that load into a developer's shell when they enter a git repository and unload when they leave. Each team self-hosts it on its own Cloudflare account. The dashboard is where the team manages that system. Success: an admin can onboard a person, a project, or a policy in minutes, and can always answer "who can read what, and is every device clean?"
+NOENV replaces `.env` files with encrypted secrets that load into a developer's shell when they enter a git repository and unload when they leave. Each team self-hosts it on its own Cloudflare account. The dashboard is where the team manages that system. Success: an admin can onboard a person, a project, or a policy in minutes, and can always answer "who can read what, and is every device clean?"
 
 ## Positioning
 
@@ -24,8 +24,8 @@ NENV replaces `.env` files with encrypted secrets that load into a developer's s
 
 ## Operating Context
 
-- Identity comes from Cloudflare Access in front of `/dashboard` and `/activate`. There is no NENV login screen.
-- Developers set up once by adding two lines to `~/.zshrc` or `~/.bashrc` from the landing page (`export NENV_URL=…` and `eval "$(nenv shell zsh)"`).
+- Identity comes from Cloudflare Access in front of `/dashboard` and `/activate`. There is no NOENV login screen.
+- Developers set up once by adding two lines to `~/.zshrc` or `~/.bashrc` from the landing page (`export NOENV_URL=…` and `eval "$(noenv shell zsh)"`).
 - Terms used everywhere: organization, project (= git repository), environment (development, staging, production, and so on), secret, version, member, role (reader, editor, admin), device (= a signed-in CLI or browser session), policy, compliance.
 - Secret history is append-only. A rollback creates a new version that copies an older ciphertext.
 
@@ -41,13 +41,13 @@ NENV replaces `.env` files with encrypted secrets that load into a developer's s
   - Minimum role for environment access.
 - **Devices:** active sessions with user, device name, CLI version, last seen, and `.env` compliance per repository and environment.
 - **Full replacement for the CLI:** every management action must be possible in the browser.
-  - **Open technical gap:** sharing an environment key with a member requires a private key in the browser. Today the only private keys live in the CLI config directory. This needs per-device keys (a browser key pair registered as a device). Until that exists, key sharing stays CLI-only (`nenv grant`), and the dashboard must say so honestly.
+  - **Open technical gap:** sharing an environment key with a member requires a private key in the browser. Today the only private keys live in the CLI config directory. This needs per-device keys (a browser key pair registered as a device). Until that exists, key sharing stays CLI-only (`noenv grant`), and the dashboard must say so honestly.
 - The dashboard never displays secret values. It cannot decrypt them.
 - The dashboard is built with React and Vite, uses no third-party design system or component library, and is served by the Worker under `/dashboard/`.
 
 ## Brand Commitments
 
-- The name is NENV. No logo, colors, or other brand assets exist; the identity is open.
+- The name is NOENV. No logo, colors, or other brand assets exist; the identity is open.
 
 ## Evidence on Hand
 
@@ -59,5 +59,5 @@ NENV replaces `.env` files with encrypted secrets that load into a developer's s
 1. **Never imply visibility we do not have.** The dashboard writes and manages secrets but cannot read them. Every surface must make that true and obvious.
 2. **Access is the main question.** For any project or environment, "who can read this?" must be answerable in one glance.
 3. **Destructive and far-reaching actions show their reach first.** Policies that delete files on developer machines, role changes, and rollbacks state exactly what will happen before they happen.
-4. **The CLI and the dashboard speak the same language.** They use the same terms and names, and the dashboard shows the matching `nenv` command where it helps.
+4. **The CLI and the dashboard speak the same language.** They use the same terms and names, and the dashboard shows the matching `noenv` command where it helps.
 5. **Calm by default.** Most visits are short, infrequent admin tasks. Optimize for orientation and correctness, not for engagement.

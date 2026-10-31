@@ -24,5 +24,5 @@ export async function decryptSecret(
 }
 
 function contextBytes({ projectId, environment, name }: SecretContext): Uint8Array<ArrayBuffer> {
-  return toBytes(`nenv-secret-v1\0${projectId}\0${environment}\0${name}`);
+  return toBytes(`noenv-secret-v1\0${projectId}\0${environment}\0${name}`);
 }

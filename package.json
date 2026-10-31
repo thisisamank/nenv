@@ -1,5 +1,5 @@
 {
-  "name": "nenv",
+  "name": "noenv",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -11,7 +11,7 @@
   "scripts": {
     "test": "node --test 'packages/*/test/*.test.ts' 'worker/test/*.test.ts' 'cli/test/*.test.ts'",
     "typecheck": "tsc && tsc -p worker && tsc -p cli && tsc -p dashboard",
-    "build": "npm run build -w @nenv/dashboard",
+    "build": "npm run build -w @noenv/dashboard",
     "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
     "setup": "node scripts/setup.ts"
   },

@@ -1,4 +1,4 @@
-import { enforceDotenvPolicy } from "@nenv/dotenv";
+import { enforceDotenvPolicy } from "@noenv/dotenv";
 import { ApiError } from "./api.ts";
 import { fetchBundle, type Bundle } from "./bundle.ts";
 import { describeOutcome, reportCompliance } from "./compliance.ts";
@@ -45,15 +45,15 @@ export async function hookEnv(input: HookInput): Promise<HookOutput> {
 
   const lines = state ? restoreLines(state) : [];
   if (!target) {
-    if (state) lines.push(...["_NENV_STATE", "_NENV_RETRY", "_NENV_REV_FILE", "_NENV_REV"].map(unsetLine));
+    if (state) lines.push(...["_NOENV_STATE", "_NOENV_RETRY", "_NOENV_REV_FILE", "_NOENV_REV"].map(unsetLine));
     return { lines, messages };
   }
 
   const loaded = await load(input as HookInput & { deployment: Deployment }, target, state, messages);
   lines.push(
     ...loaded.lines,
-    setLine("_NENV_STATE", encodeState(loaded.state)),
-    loaded.state.retry ? setLine("_NENV_RETRY", "1") : unsetLine("_NENV_RETRY"),
+    setLine("_NOENV_STATE", encodeState(loaded.state)),
+    loaded.state.retry ? setLine("_NOENV_RETRY", "1") : unsetLine("_NOENV_RETRY"),
     ...revisionLines(input, target, loaded.state.revision),
   );
   return { lines, messages };
@@ -69,8 +69,8 @@ async function isCurrent(input: HookInput, state: LoadedState): Promise<boolean>
 }
 
 function revisionLines(input: HookInput, target: Target, revision: number | undefined): string[] {
-  if (revision === undefined || !input.deployment) return [unsetLine("_NENV_REV_FILE"), unsetLine("_NENV_REV")];
-  return [setLine("_NENV_REV_FILE", markerPath(input.deployment, target.repo, target.environment)), setLine("_NENV_REV", String(revision))];
+  if (revision === undefined || !input.deployment) return [unsetLine("_NOENV_REV_FILE"), unsetLine("_NOENV_REV")];
+  return [setLine("_NOENV_REV_FILE", markerPath(input.deployment, target.repo, target.environment)), setLine("_NOENV_REV", String(revision))];
 }
 
 async function load(
@@ -148,7 +148,7 @@ async function enforceDotenv(loaded: Loaded, messages: string[]): Promise<{ bloc
 
   messages.push(...result.files.map((file) => describeOutcome(target, file)));
   if (result.blocked) {
-    messages.push(`secrets were not loaded: the "${policy.mode}" policy does not allow .env files, run \`nenv migrate\``);
+    messages.push(`secrets were not loaded: the "${policy.mode}" policy does not allow .env files, run \`noenv migrate\``);
   }
   await reportCompliance(deployment, token, target, result).catch(() => messages.push("could not report compliance"));
 
@@ -163,7 +163,7 @@ async function signIn(
 ): Promise<LoadedState> {
   const waiting = await readPendingSignIn(input.deployment);
   if (state?.notified && !(waiting && waiting.expiresAt > Date.now())) {
-    messages.push("sign-in was not completed, run `nenv auth` to try again");
+    messages.push("sign-in was not completed, run `noenv auth` to try again");
     return empty;
   }
 

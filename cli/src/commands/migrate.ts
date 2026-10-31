@@ -1,4 +1,4 @@
-import { findDotenvFiles, migrateDotenvFile, readDotenvFile, removeIfUnchanged, type FileOutcome } from "@nenv/dotenv";
+import { findDotenvFiles, migrateDotenvFile, readDotenvFile, removeIfUnchanged, type FileOutcome } from "@noenv/dotenv";
 import { relative } from "node:path";
 import { fetchBundle } from "../bundle.ts";
 import { reportCompliance } from "../compliance.ts";
@@ -31,7 +31,7 @@ export async function migrateCommand(): Promise<void> {
 
     const result = await migrateDotenvFile(file, store);
     if (result.conflicts.length > 0) {
-      console.log(`${name}: kept, values differ from NENV for ${result.conflicts.join(", ")}`);
+      console.log(`${name}: kept, values differ from NOENV for ${result.conflicts.join(", ")}`);
       outcomes.push({ path, status: "conflict", names: result.conflicts });
       continue;
     }
@@ -41,7 +41,7 @@ export async function migrateCommand(): Promise<void> {
       continue;
     }
 
-    console.log(`${name}: ${Object.keys(file.values).length} values are stored in NENV`);
+    console.log(`${name}: ${Object.keys(file.values).length} values are stored in NOENV`);
     if (!(await confirm(`Delete ${name}?`))) {
       outcomes.push({ path, status: "migrated", names: [] });
       continue;

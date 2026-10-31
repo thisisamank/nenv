@@ -4,7 +4,7 @@ import { readGitOrigin } from "./git.ts";
 import { DEFAULT_CONFIG, parseConfig, type ProjectConfig } from "./parse.ts";
 import { normalizeRemoteUrl } from "./repo.ts";
 
-export const CONFIG_FILE = ".nenv";
+export const CONFIG_FILE = ".noenv";
 
 export type Project = ProjectConfig & {
   root: string;

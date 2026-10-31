@@ -26,7 +26,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
 
   if (setup.loading) {
     return (
-      <AuthScreen title="nenv">
+      <AuthScreen title="noenv">
         <Loading />
       </AuthScreen>
     );
@@ -35,7 +35,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
   if (setup.data?.available) {
     const submit = (event: FormEvent) => (event.preventDefault(), run(() => setUpAdmin(email)));
     return (
-      <AuthScreen title="Set up nenv">
+      <AuthScreen title="Set up noenv">
         <p className="muted">Use the admin email you entered when you deployed.</p>
         <form onSubmit={submit} style={{ display: "grid", gap: 12, width: "100%" }}>
           <input type="email" placeholder="you@company.com" aria-label="Admin email" value={email} onChange={(event) => setEmail(event.target.value)} required autoFocus />
@@ -49,7 +49,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
   }
 
   return (
-    <AuthScreen title="Sign in to nenv">
+    <AuthScreen title="Sign in to noenv">
       <button className="btn primary wide" onClick={() => run(signInWithPasskey)} disabled={busy}>
         Sign in with passkey
       </button>

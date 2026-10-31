@@ -1,5 +1,5 @@
 {
-  "name": "@nenv/policy",
+  "name": "@noenv/policy",
   "private": true,
   "type": "module",
   "exports": "./src/index.ts"

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { compareVersions, DEFAULT_POLICIES, isPolicyName, mergePolicies, PolicyError, validatePolicy } from "@nenv/policy";
+import { compareVersions, DEFAULT_POLICIES, isPolicyName, mergePolicies, PolicyError, validatePolicy } from "@noenv/policy";
 
 test("more specific layers override less specific ones", () => {
   const merged = mergePolicies([{ environmentMinRole: "editor" }, {}, { environmentMinRole: "admin" }]);
