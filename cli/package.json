@@ -1,6 +1,6 @@
 {
   "name": "nenv-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Encrypted environment variables that load when you cd into a repo. CLI for nenv.",
   "type": "module",
   "bin": {
