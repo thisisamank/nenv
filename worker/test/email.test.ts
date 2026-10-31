@@ -103,6 +103,15 @@ test("a fresh deployment emails the setup link to the admin email only", async (
   }
 });
 
+test("a placeholder sender address leaves email off", async () => {
+  for (const placeholder of ["none", "", "noenv"]) {
+    const env = { ...withEmail, EMAIL_FROM: placeholder };
+    const created = await call(env, "POST", "/v1/users", { token: admin, body: { email: `p${placeholder.length}@example.com` } });
+    assert.equal(created.body.emailed, false);
+  }
+  assert.equal(sent.length, 0);
+});
+
 test("setup by email is unavailable without email configured", async () => {
   const response = await call({ ...worker.env, ADMIN_EMAIL: "owner@example.com" }, "POST", "/v1/setup/email", { headers: { Origin: ORIGIN } });
   assert.equal(response.status, 409);

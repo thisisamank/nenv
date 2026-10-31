@@ -16,8 +16,10 @@ type Copy = {
   reason: string;
 };
 
+const ADDRESS = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function canSendEmail(env: Env): boolean {
-  return Boolean(env.EMAIL && env.EMAIL_FROM);
+  return Boolean(env.EMAIL) && ADDRESS.test(env.EMAIL_FROM?.trim() ?? "");
 }
 
 export async function sendInviteEmail(env: Env, invite: InviteEmail): Promise<boolean> {
@@ -26,7 +28,7 @@ export async function sendInviteEmail(env: Env, invite: InviteEmail): Promise<bo
   const copy = inviteCopy(invite, new URL(invite.link).host);
   try {
     await env.EMAIL!.send({
-      from: { email: env.EMAIL_FROM!, name: "noenv" },
+      from: { email: env.EMAIL_FROM!.trim(), name: "noenv" },
       to: invite.to,
       subject: copy.subject,
       html: renderHtml(copy, invite.link),

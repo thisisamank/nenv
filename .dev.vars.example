@@ -1,1 +1,2 @@
 ADMIN_EMAIL=you@example.com
+EMAIL_FROM=none # optional: noenv@your-domain.com to email invites

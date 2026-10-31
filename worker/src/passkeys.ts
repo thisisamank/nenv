@@ -71,7 +71,7 @@ export async function emailSetupLink({ request, env }: Context): Promise<Respons
 
   const link = await createInviteLink(env.DB, request, admin.userId);
   if (!(await sendInviteEmail(env, { to: admin.email, link, invitedBy: null }))) {
-    throw new HttpError(502, "the setup email could not be sent, check the Worker logs");
+    throw new HttpError(502, "the setup email could not be sent: check that EMAIL_FROM uses a domain onboarded to Cloudflare Email Sending, or remove EMAIL_FROM to set up without email");
   }
   return json({ sent: true });
 }

@@ -45,7 +45,7 @@ Deploy, create a passkey, install the CLI, approve your terminal, and move your 
 
 ## Get started
 
-**1. Deploy.** Click the button above and enter your email as `ADMIN_EMAIL`.
+**1. Deploy.** Click the button above. Enter your email as `ADMIN_EMAIL`. For `EMAIL_FROM`, enter a sender address on a domain with Email Sending enabled to [email invites](#invitation-emails), or keep `none`.
 
 **2. Create your admin passkey.** Open `https://<your-worker>.workers.dev/dashboard/` and sign up with the same email. If [invitation emails](#invitation-emails) are on, the dashboard emails you a setup link instead. Passkeys use Touch ID, Face ID, or a security key. There are no passwords.
 
@@ -102,7 +102,7 @@ Roles: **reader** loads secrets, **editor** also writes them, **admin** also man
 noenv can email invites and the first admin's setup link through [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/). Without it, the dashboard and `noenv invite` give you the link to send yourself.
 
 1. Onboard your domain: `npx wrangler email sending enable example.com`
-2. Set the sender address, on that domain: `npx wrangler secret put EMAIL_FROM` (for example `noenv@example.com`)
+2. Set the sender address on that domain. With the Deploy button, enter it as `EMAIL_FROM`. Later, or from a checkout: `npx wrangler secret put EMAIL_FROM` (for example `noenv@example.com`).
 
 The `EMAIL` binding is already in `wrangler.jsonc`. When email is on, the first admin gets the setup link by email, so only someone with access to `ADMIN_EMAIL` can claim the deployment.
 

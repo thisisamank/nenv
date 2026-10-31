@@ -24,6 +24,12 @@
     "bindings": {
       "ADMIN_EMAIL": {
         "description": "Your email. Only this address can create the first admin passkey on the dashboard."
+      },
+      "EMAIL_FROM": {
+        "description": "Optional. The address invites are sent from, on a domain with [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/) enabled, like `noenv@example.com`. Type `none` to skip email and share invite links yourself."
+      },
+      "EMAIL": {
+        "description": "Sends invites and the admin setup link when `EMAIL_FROM` is set. Nothing to configure."
       }
     }
   }
