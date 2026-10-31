@@ -189,7 +189,7 @@ test("delete mode migrates .env files, deletes them, and loads their values", as
 
   assert.equal(existsSync(join(root, ".env")), false);
   assert.equal(existsSync(join(root, ".env.example")), true);
-  assert.deepEqual(result.messages, [".env: migrated to NOENV and deleted", "loaded 1 secrets for github.com/acme/delete-mode (development)"]);
+  assert.deepEqual(result.messages, [".env: migrated to noenv and deleted", "loaded 1 secrets for github.com/acme/delete-mode (development)"]);
   assert.equal(bash(`${result.lines.join("\n")}\nprintf '%s' "$LOCAL_ONLY"`), "from-dotenv");
 
   const { devices } = await api<any>(deployment, "GET", "/v1/devices", { token: adminToken });

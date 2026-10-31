@@ -62,7 +62,7 @@ test("delete mode migrates values, verifies them, and deletes the files", async 
   assert.equal(existsSync(join(root, ".env")), false);
 });
 
-test("a value that differs from NOENV is a conflict and the file is kept", async () => {
+test("a value that differs from noenv is a conflict and the file is kept", async () => {
   const root = await project({ ".env": "DATABASE_URL=localhost\nNEW_KEY=1" });
   const store = memoryStore({ DATABASE_URL: "postgres://shared" });
 

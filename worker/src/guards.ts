@@ -118,7 +118,7 @@ function safeDecode(value: string): string {
 function requireCliVersion(request: Request, policies: Policies): void {
   const version = request.headers.get(CLI_VERSION_HEADER);
   if (policies.minCliVersion && version !== null && compareVersions(version, policies.minCliVersion) < 0) {
-    throw new HttpError(426, `NOENV CLI ${policies.minCliVersion} or newer is required, you have ${version}`);
+    throw new HttpError(426, `noenv CLI ${policies.minCliVersion} or newer is required, you have ${version}`);
   }
 }
 

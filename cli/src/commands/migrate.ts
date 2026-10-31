@@ -31,7 +31,7 @@ export async function migrateCommand(): Promise<void> {
 
     const result = await migrateDotenvFile(file, store);
     if (result.conflicts.length > 0) {
-      console.log(`${name}: kept, values differ from NOENV for ${result.conflicts.join(", ")}`);
+      console.log(`${name}: kept, values differ from noenv for ${result.conflicts.join(", ")}`);
       outcomes.push({ path, status: "conflict", names: result.conflicts });
       continue;
     }
@@ -41,7 +41,7 @@ export async function migrateCommand(): Promise<void> {
       continue;
     }
 
-    console.log(`${name}: ${Object.keys(file.values).length} values are stored in NOENV`);
+    console.log(`${name}: ${Object.keys(file.values).length} values are stored in noenv`);
     if (!(await confirm(`Delete ${name}?`))) {
       outcomes.push({ path, status: "migrated", names: [] });
       continue;

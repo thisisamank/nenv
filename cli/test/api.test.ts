@@ -11,5 +11,5 @@ test("the API client reports a redirect instead of following it", async () => {
   await assert.rejects(api(deployment, "POST", "/v1/auth/device"), /Cloudflare Access does not protect \/v1/);
 
   const html = { ...deployment, fetch: async () => new Response("<html>login</html>", { status: 200 }) };
-  await assert.rejects(api(html, "POST", "/v1/auth/device"), /did not return a NOENV API response/);
+  await assert.rejects(api(html, "POST", "/v1/auth/device"), /did not return a noenv API response/);
 });

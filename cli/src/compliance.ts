@@ -7,11 +7,11 @@ import type { Target } from "./target.ts";
 const DESCRIPTIONS: Record<FileOutcome["status"], string> = {
   found: "found",
   invalid: "kept, it has invalid variable names",
-  conflict: "kept, its values differ from NOENV",
+  conflict: "kept, its values differ from noenv",
   failed: "kept, it could not be migrated",
-  migrated: "migrated to NOENV",
+  migrated: "migrated to noenv",
   changed: "kept, it changed during migration",
-  deleted: "migrated to NOENV and deleted",
+  deleted: "migrated to noenv and deleted",
 };
 
 export function describeOutcome(target: Target, outcome: FileOutcome): string {

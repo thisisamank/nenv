@@ -37,7 +37,7 @@ export async function inviteCommand([email]: string[]): Promise<void> {
   const { deployment, token } = await signedIn();
 
   await api(deployment, "POST", "/v1/users", { token, body: { email } });
-  console.log(`Invited ${email}. They can sign in from the NOENV landing page: ${deployment.url}`);
+  console.log(`Invited ${email}. They can sign in from the noenv landing page: ${deployment.url}`);
 }
 
 export async function grantCommand([email, role]: string[]): Promise<void> {

@@ -15,7 +15,7 @@ const USAGE = `usage: noenv <command>
   secret list                list secrets in this environment
   secret history KEY         list the versions of a secret
   secret rollback KEY VER    restore an older version of a secret
-  migrate                    move .env files of this repository into NOENV
+  migrate                    move .env files of this repository into noenv
   invite EMAIL               invite a user to this deployment
   grant EMAIL ROLE           give a user access to this project and environment
   revoke EMAIL               remove a user from this project

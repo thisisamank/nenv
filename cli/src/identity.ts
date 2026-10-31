@@ -33,7 +33,7 @@ export async function ensureIdentity(deployment: Deployment, token: string): Pro
 
   if (local && me.publicKey === local.publicKey) return local;
   if (me.publicKey) {
-    throw new Error(`your NOENV key was registered on another device, copy ${identityPath(deployment)} from that device`);
+    throw new Error(`your noenv key was registered on another device, copy ${identityPath(deployment)} from that device`);
   }
 
   const identity = local ?? (await createIdentity(deployment));

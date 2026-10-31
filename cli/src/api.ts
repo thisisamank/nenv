@@ -36,7 +36,7 @@ export async function api<T>(deployment: Deployment, method: string, path: strin
 
   const data: any = response.status === 204 ? null : await response.json().catch(() => undefined);
   if (data === undefined) {
-    throw new ApiError(response.status, `${deployment.url} did not return a NOENV API response (status ${response.status})`);
+    throw new ApiError(response.status, `${deployment.url} did not return a noenv API response (status ${response.status})`);
   }
   if (!response.ok) {
     throw new ApiError(response.status, data?.error ?? `request failed with status ${response.status}`);

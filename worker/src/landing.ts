@@ -7,18 +7,18 @@ export async function landingPage({ request }: Context): Promise<Response> {
   const origin = new URL(request.url).origin;
 
   return htmlPage(
-    "NOENV",
-    `<h1>NOENV</h1>
+    "noenv",
+    `<h1>noenv</h1>
 <p>Secrets for your projects load when you enter the repository and unload when you leave it.</p>
 <h2>1. Install the CLI</h2>
 <pre>${escapeHtml(INSTALL_COMMAND)}</pre>
-<h2>2. Add NOENV to your shell</h2>
+<h2>2. Add noenv to your shell</h2>
 <p>Zsh: add these lines to <code>~/.zshrc</code></p>
 <pre>${escapeHtml(shellLines(origin, "zsh"))}</pre>
 <p>Bash: add these lines to <code>~/.bashrc</code></p>
 <pre>${escapeHtml(shellLines(origin, "bash"))}</pre>
 <h2>3. Open a new terminal</h2>
-<p>NOENV asks you to sign in the first time, and again when your session expires.</p>
+<p>noenv asks you to sign in the first time, and again when your session expires.</p>
 <p><a href="/dashboard/">Open the dashboard</a></p>`,
   );
 }
