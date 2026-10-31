@@ -1,15 +1,38 @@
-# noenv
+<h1 align="center">noenv</h1>
 
-Encrypted environment variables that load when you `cd` into a repo, and unload when you leave. No more `.env` files.
+<p align="center">
+  <b>Stop passing <code>.env</code> files around.</b><br>
+  Encrypted environment variables that load when you <code>cd</code> into a repo and unload when you leave.<br>
+  Self-hosted on your own Cloudflare account.
+</p>
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv)
+<p align="center">
+  <a href="https://noenv.thisisamank.in">Website</a> ·
+  <a href="https://noenv.thisisamank.in/assets/tour.mp4">40-second demo</a> ·
+  <a href="https://www.npmjs.com/package/noenv-cli">npm</a>
+</p>
+
+<p align="center">
+  <img src="docs/demo.gif" alt="A teammate saves a new secret version in the dashboard, and the terminal picks it up at the next prompt" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/thisisamank/noenv"><img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare"></a>
+</p>
 
 ```console
+$ npm install -g noenv-cli
 $ cd ~/code/backend
 noenv: loaded 12 secrets for github.com/acme/backend (development)
 $ npm run dev        # your app sees DATABASE_URL, STRIPE_KEY, …
 $ cd ..              # and they are gone again
 ```
+
+## Demo
+
+[![Watch the 40-second tour: deploy, passkey, install, connect, migrate](docs/tour.jpg)](https://noenv.thisisamank.in/assets/tour.mp4)
+
+Deploy, create a passkey, install the CLI, approve your terminal, and move your `.env` files in, in 40 seconds.
 
 ## What it does
 
@@ -46,7 +69,7 @@ Open a new terminal and `cd` into a repo. Your browser opens once so you can app
 ```sh
 cd ~/code/backend
 noenv init                  # creates the project and a development environment
-noenv secret set API_KEY    # the value is read without echo
+noenv secret set API_KEY    # prompts for the value and keeps it off screen
 ```
 
 ## Everyday use

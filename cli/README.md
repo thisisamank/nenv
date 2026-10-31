@@ -2,6 +2,10 @@
 
 The command-line client for [noenv](https://github.com/thisisamank/noenv): encrypted environment variables that load when you `cd` into a repo, and unload when you leave.
 
+![A teammate saves a new secret version in the dashboard, and the terminal picks it up at the next prompt](https://raw.githubusercontent.com/thisisamank/noenv/main/docs/demo.gif)
+
+[Website](https://noenv.thisisamank.in) · [40-second demo](https://noenv.thisisamank.in/assets/tour.mp4)
+
 ```console
 $ cd ~/code/backend
 noenv: loaded 12 secrets for github.com/acme/backend (development)
